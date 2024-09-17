@@ -1,0 +1,7 @@
+Frontend/node_modules/
+Frontend/.next/
+Frontend/out/
+Frontend/*.log
+Frontend/*.lock
+Frontend/.env
+venv/

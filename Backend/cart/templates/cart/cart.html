@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Your Shopping Cart</h1>
+    
+    {% if items %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Total</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>
+                    {% if item.product.images.first %}
+                        <img src="{{ item.product.images.first.image.url }}" 
+                             alt="{{ item.product.name }}" 
+                             class="img-thumbnail" 
+                             style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px;">
+                    {% else %}
+                        <img src="{% static 'images/default_product.jpg' %}" 
+                             alt="{{ item.product.name }}" 
+                             class="img-thumbnail" 
+                             style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px;">
+                    {% endif %}
+                    {{ item.product.name }}
+                </td>
+                <td>
+                    <form action="{% url 'cart:update_cart_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control d-inline" style="width: 60px;">
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+                <td>Price: {{ item.product.discounted_price|default:item.product.original_price }}</td>
+                <td>${{ item.get_total_price }}</td>
+                <td>
+                    <form action="{% url 'cart:remove_from_cart' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-end">
+        <h3>Total: ${{ total_price }}</h3>
+        <a href="{% url 'cart:checkout_view' %}" class="btn btn-success btn-lg mt-3">Proceed to Checkout</a>
+    </div>
+    {% else %}
+    <p class="text-center">Your cart is currently empty.</p>
+    <div class="text-center">
+        <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">{{ category.name }}</h1>
+
+    <!-- Category Description and Image -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <p>{{ category.description }}</p>
+        </div>
+        <div class="col-md-4 text-center">
+            {% if category.image %}
+            <img src="{{ category.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ category.name }}">
+            {% else %}
+            <img src="{% static 'images/default_product.jpg' %}" class="img-fluid rounded shadow-sm" alt="Default Image">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Subcategories Section -->
+    {% if subcategories %}
+    <div class="mt-5">
+        <h2 class="text-center">Subcategories</h2>
+        <div class="row">
+            {% for subcategory in subcategories %}
+            <div class="col-md-3">
+                <div class="card shadow-sm mb-4">
+                    {% if subcategory.image %}
+                    <img src="{{ subcategory.image.url }}" class="card-img-top" alt="{{ subcategory.name }}">
+                    {% else %}
+                    <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Default Image">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ subcategory.name }}</h5>
+                        <a href="{% url 'catalog:category_detail' subcategory.slug %}" class="btn btn-outline-primary btn-block">View Subcategory</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Products Section -->
+    {% if category.products.all %}
+    <div class="mt-5">
+        <h2 class="text-center">Products in {{ category.name }}</h2>
+        <div class="row">
+            {% for product in category.products.all %}
+            <div class="col-md-3">
+                <div class="card shadow-sm mb-4">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Default Image">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                        <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-primary btn-block">View Product</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center mt-5">No products available in this category.</p>
+    {% endif %}
+</div>
+{% endblock %}

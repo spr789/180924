@@ -1,0 +1,9 @@
+<ul class="autocomplete-suggestions">
+    {% for suggestion in suggestions %}
+    <li class="autocomplete-suggestion-item">
+        <a href="{% url 'search:search_results' %}?q={{ suggestion.suggestion }}">
+            {{ suggestion.suggestion }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>

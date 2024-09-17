@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlists{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">My Wishlists</h1>
+    
+    {% if wishlists %}
+        <div class="row">
+            {% for wishlist in wishlists %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ wishlist.name }}</h5>
+                            <p class="card-text">{{ wishlist.description|truncatewords:20 }}</p>
+                            <p class="card-text"><strong>Items:</strong> {{ wishlist.items.count }}</p>
+                            <a href="{% url 'wishlist:wishlist_detail' wishlist.id %}" class="btn btn-primary">View Wishlist</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">You have no wishlists yet.</p>
+        <div class="text-center">
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

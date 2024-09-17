@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Add New Product</h2>
+
+    <!-- Display form errors at the top -->
+    {% if form.errors or image_form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field|capfirst }}</strong>: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for field, errors in image_form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field|capfirst }}</strong>: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Product form fields -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label">Product Name</label>
+                {{ form.name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.slug.id_for_label }}" class="form-label">Slug</label>
+                {{ form.slug|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+            {{ form.description|add_class:"form-control" }}
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.original_price.id_for_label }}" class="form-label">Original Price</label>
+                {{ form.original_price|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.discounted_price.id_for_label }}" class="form-label">Discounted Price</label>
+                {{ form.discounted_price|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                {{ form.category|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.collections.id_for_label }}" class="form-label">Collections</label>
+                {{ form.collections|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+                {{ form.tags|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
+                {{ form.stock|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Image upload field -->
+        <div class="mb-3">
+            <label for="{{ image_form.image.id_for_label }}" class="form-label">Product Image</label>
+            {{ image_form.image }}
+        </div>
+        
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Add Product</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

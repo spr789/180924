@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Products</h1>
+    <div class="row">
+        {% if products %}
+            {% for product in products %}
+                <div class="col-md-3 mb-4">
+                    <div class="card product-card h-100">
+                        <div class="position-relative">
+                            <img src="{% if product.image %}{{ product.image.url }}{% else %}/static/images/default_product.jpg{% endif %}" class="card-img-top product-image" alt="{{ product.name }}">
+                            <a href="{% url 'wishlist:add_to_wishlist' product.id %}" class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" title="Add to Wishlist">
+                                <i class="fa fa-heart"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.category.name }}</p>
+                            <p class="card-text">
+                                <span class="original-price">₹{{ product.original_price }}</span>
+                                {% if product.discounted_price %}
+                                    <span class="discounted-price">₹{{ product.discounted_price }}</span>
+                                    <span class="discount-percentage">({{ product.discount_percentage }}% OFF)</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-primary btn-sm w-100 mb-2">View Details</a>
+                            <a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-success btn-sm w-100">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No products available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

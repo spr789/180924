@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Vendor Register{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Vendor Registration</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Display form-wide non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <!-- Display errors for each field -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">Name</label>
+                    <input type="text" name="username" class="form-control" id="username" value="{{ form.username.value|default_if_none:'' }}">
+                    {% if form.username.errors %}
+                    <div class="text-danger">
+                        {{ form.username.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <input type="text" name="phone_number" class="form-control" id="phone_number" value="{{ form.phone_number.value|default_if_none:'' }}">
+                    {% if form.phone_number.errors %}
+                    <div class="text-danger">
+                        {{ form.phone_number.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email (Optional)</label>
+                    <input type="email" name="email" class="form-control" id="email" value="{{ form.email.value|default_if_none:'' }}">
+                    {% if form.email.errors %}
+                    <div class="text-danger">
+                        {{ form.email.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="password1" class="form-label">Password</label>
+                    <input type="password" name="password1" class="form-control" id="password1">
+                    {% if form.password1.errors %}
+                    <div class="text-danger">
+                        {{ form.password1.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="password2" class="form-label">Confirm Password</label>
+                    <input type="password" name="password2" class="form-control" id="password2">
+                    {% if form.password2.errors %}
+                    <div class="text-danger">
+                        {{ form.password2.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

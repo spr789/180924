@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Vendor Shipments{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Vendor Shipments</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Shipment ID</th>
+                <th>Order ID</th>
+                <th>Shipped Date</th>
+                <th>Delivery Date</th>
+                <th>Tracking Number</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shipment in shipments %}
+            <tr>
+                <td>{{ shipment.id }}</td>
+                <td>{{ shipment.order.id }}</td>
+                <td>{{ shipment.shipped_date }}</td>
+                <td>{{ shipment.delivery_date }}</td>
+                <td>{{ shipment.tracking_number }}</td>
+                <td>{{ shipment.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

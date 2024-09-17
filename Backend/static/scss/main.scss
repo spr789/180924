@@ -1,0 +1,49 @@
+
+// Import FontAwesome
+@import 'vendors/fontawesome';
+
+// Import base styles
+@import 'base/variables';    // Define your global variables
+@import 'base/mixins';       // Common mixins for reuse
+@import 'base/reset';        // CSS reset to ensure consistency across browsers
+@import 'base/typography';   // Global typography styles
+@import 'base/animations';   // Common animations
+
+// Import component styles
+@import 'components/buttons';  // Styles for buttons
+@import 'components/cards';    // Styles for card components
+@import 'components/forms';    // Styles for forms
+@import 'components/navbars';  // Styles for navigation bars
+@import 'components/modals';   // Styles for modal dialogs
+@import 'components/tables';   // Styles for tables
+
+// Import layout styles
+@import 'layout/header';           // Styles for the header
+@import 'layout/footer';           // Styles for the footer
+@import 'layout/grid';             // Grid layout styles
+@import 'layout/sidebar';          // Sidebar layout styles
+@import 'layout/main';             // Main content area layout
+@import 'layout/vendor_dashboard'; // Vendor dashboard layout
+@import 'layout/product_page';     // Product page layout
+
+// Import page-specific styles
+@import 'pages/home';           // Home page styles
+@import 'pages/product_list';   // Product listing page styles
+@import 'pages/checkout';       // Checkout page styles
+@import 'pages/login';          // Login page styles
+@import 'pages/register';       // Register page styles
+
+// Import theme styles
+@import 'themes/default';    // Default theme styles
+@import 'themes/dark';       // Dark theme styles
+@import 'themes/light';      // Light theme styles
+
+// Import utility styles
+@import 'utils/helpers';     // Utility classes and helper functions
+@import 'utils/variables';   // Utility variables
+
+// Vendor-specific styles should be loaded last
+@import 'vendors/bootstrap';   // Override Bootstrap styles if needed
+@import 'vendors/fontawesome'; // Override FontAwesome styles if needed
+
+

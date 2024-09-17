@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Addresses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Manage Addresses</h1>
+    <p>You have {{ addresses.count }} addresses.</p>
+
+    <a href="{% url 'accounts:add_address' %}" class="btn btn-primary mb-3">Add New Address</a>
+    {% if addresses %}
+        <ul class="list-group">
+            {% for address in addresses %}
+            <li class="list-group-item">
+                {{ address.address_line_1 }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.postal_code }}
+                {% if address.is_default %}<span class="badge bg-success">Default</span>{% endif %}
+                <a href="{% url 'accounts:update_address' address.id %}" class="btn btn-sm btn-info float-end">Edit</a>
+                <form action="{% url 'accounts:delete_address' address.id %}" method="post" class="float-end me-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have {{ addresses.count }} addresses.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Vendor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Vendor Dashboard</h1>
+
+    <!-- Vendor Metrics and Products Tab -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sales</h5>
+                    <p class="card-text">${{ analytics.total_sales }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <p class="card-text">{{ analytics.total_orders }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text">${{ analytics.total_revenue }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'products:product_list' %}" class="text-decoration-none text-dark">
+                            Products
+                        </a>
+                    </h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'products:add_product' %}" class="btn btn-primary btn-sm">Add Product</a>
+                        <a href="{% url 'products:bulk_upload_products' %}" class="btn btn-success btn-sm">Bulk Add Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3>Recent Orders</h3>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order.order_number }}</td>
+                        <td>{{ order.product.name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>${{ order.price }}</td>
+                        <td>{{ order.status }}</td>
+                        <td><a href="{% url 'vendor_order_detail' order.id %}" class="btn btn-primary btn-sm">View Details</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Shipments Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3>Recent Shipments</h3>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Shipment ID</th>
+                        <th>Order ID</th>
+                        <th>Shipped Date</th>
+                        <th>Delivery Date</th>
+                        <th>Tracking Number</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shipment in shipments %}
+                    <tr>
+                        <td>{{ shipment.id }}</td>
+                        <td>{{ shipment.order.order_number }}</td>
+                        <td>{{ shipment.shipped_date|date:"Y-m-d" }}</td>
+                        <td>{{ shipment.delivery_date|date:"Y-m-d" }}</td>
+                        <td>{{ shipment.tracking_number }}</td>
+                        <td>{{ shipment.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

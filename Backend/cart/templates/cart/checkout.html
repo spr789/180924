@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Checkout</h1>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between">
+        <!-- Shipping Information on the left (flex-grow for responsiveness) -->
+        <div class="flex-grow-1 me-md-3 mb-5 mb-md-0">
+            <h3>Shipping Information</h3>
+            <form method="post" action="{% url 'cart:checkout_view' %}">
+                {% csrf_token %}
+                
+                <!-- Display form fields dynamically -->
+                <div class="form-group mb-3">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.phone_number.label_tag }}
+                    {{ form.phone_number }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.address1.label_tag }}
+                    {{ form.address1 }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.landmark.label_tag }}
+                    {{ form.landmark }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.city.label_tag }}
+                    {{ form.city }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.state.label_tag }}
+                    {{ form.state }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.pin_code.label_tag }}
+                    {{ form.pin_code }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.country.label_tag }}
+                    {{ form.country }}
+                </div>
+
+                <!-- Payment Method -->
+                <h3 class="mt-4">Payment Method</h3>
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD" checked>
+                        <label class="form-check-label" for="cod">
+                            Cash on Delivery
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="online" value="Online">
+                        <label class="form-check-label" for="online">
+                            Online Payment
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary w-100 mt-3">Place Order</button>
+            </form>
+        </div>
+
+        <!-- Order Summary on the right -->
+        <div class="flex-grow-1 ms-md-3">
+            <h3>Order Summary</h3>
+            <ul class="list-group mb-4">
+                {% for item in cart.items.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                    <span>₹{{ item.get_total_price }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <h4 class="text-end">Total: ₹{{ cart.get_total_price }}</h4>
+        </div>
+    </div>
+</div>
+{% endblock %}
