@@ -6,10 +6,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from .models import CustomUser, UserProfile, Address
 from .serializers import (
-    CustomUserCreationSerializer, CustomUserSerializer, 
+    CustomUserCreationSerializer, CustomUserSerializer,
     CustomUserUpdateSerializer, UserProfileSerializer, AddressSerializer
 )
 from django.shortcuts import get_object_or_404
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Register API View
 class RegisterAPIView(APIView):
@@ -31,7 +32,12 @@ class LoginAPIView(APIView):
 
         if user is not None:
             login(request, user)
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            # Generate token
+            token = RefreshToken.for_user(user)
+            return Response({
+                'token': str(token.access_token),  # Include the token in the response
+                'message': 'Login successful'
+            }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid phone number or password'}, status=status.HTTP_400_BAD_REQUEST)
 

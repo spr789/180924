@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,)
 
 urlpatterns = [
-    #path('accounts/', include('accounts.api_urls', namespace='accounts-api')),
+    path('accounts/', include('accounts.api_urls', namespace='accounts-api')),
     path('catalog/', include('catalog.api_urls', namespace='catalog-api')),
     path('products/', include('products.api_urls', namespace='products-api')),
     path('orders/', include('orders.api_urls', namespace='orders-api')),
