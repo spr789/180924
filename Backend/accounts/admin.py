@@ -32,14 +32,20 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 # Admin for Address
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'address_line_1', 'city', 'state', 'country', 'is_default', 'address_verified')
-    search_fields = ('user__phone_number', 'user__email', 'city', 'state', 'country')
-    list_filter = ('country', 'is_default', 'address_verified')
+    list_display = ('get_user_info', 'address_line_1', 'city', 'state', 'country', 'address_type', 'is_default', 'address_verified')
+    search_fields = ('user__phone_number', 'guest_user__session_key', 'city', 'state', 'country')
+    list_filter = ('country', 'is_default', 'address_verified', 'address_type')
+
+    def get_user_info(self, obj):
+        if obj.user:
+            return obj.user.phone_number
+        return f"Guest-{obj.guest_user.session_key[:8]}"
+    get_user_info.short_description = 'User'
 
 # Admin for UserActivity
 class UserActivityAdmin(admin.ModelAdmin):
-    list_display = ('user', 'activity', 'timestamp', 'ip_address', 'successful')
-    search_fields = ('user__phone_number', 'user__email', 'activity', 'ip_address')
+    list_display = ('user', 'activity', 'timestamp', 'ip_address', 'location', 'successful')
+    search_fields = ('user__phone_number', 'activity', 'ip_address', 'location')
     list_filter = ('successful', 'activity')
     readonly_fields = ('user', 'activity', 'timestamp', 'ip_address', 'location', 'device_info', 'user_agent', 'successful')
 

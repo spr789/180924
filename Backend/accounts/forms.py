@@ -39,7 +39,7 @@ class CustomUserChangeForm(UserChangeForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('profile_picture', 'date_of_birth', 'gender', 'bio', 'timezone')
+        fields = ('profile_picture', 'date_of_birth', 'gender', 'bio', 'website_url', 'timezone')
 
 # Address form
 class AddressForm(forms.ModelForm):
@@ -58,27 +58,34 @@ class AddressForm(forms.ModelForm):
         state = cleaned_data.get('state')
         postal_code = cleaned_data.get('postal_code')
         country = cleaned_data.get('country')
+        
+        # Get user or guest_user from instance
         user = self.instance.user
+        guest_user = self.instance.guest_user
 
-        # Check if the user already has this address
-        if Address.objects.filter(
-            user=user,
-            address_line_1=address_line_1,
-            address_line_2=address_line_2,
-            city=city,
-            state=state,
-            postal_code=postal_code,
-            country=country
-        ).exists():
-            raise forms.ValidationError("This address already exists.")
+        # Check if the address already exists
+        address_filter = {
+            'address_line_1': address_line_1,
+            'address_line_2': address_line_2,
+            'city': city,
+            'state': state,
+            'postal_code': postal_code,
+            'country': country
+        }
 
-        # Check if the user has more than 3 addresses
-        if user.addresses.count() >= 4:
-            raise forms.ValidationError("You cannot have more than 3 addresses.")
+        if user:
+            address_filter['user'] = user
+            if Address.objects.filter(**address_filter).exists():
+                raise forms.ValidationError("This address already exists.")
+            # Check address limit for registered users
+            if user.addresses.count() >= 4:
+                raise forms.ValidationError("You cannot have more than 3 addresses.")
+        elif guest_user:
+            address_filter['guest_user'] = guest_user
+            if Address.objects.filter(**address_filter).exists():
+                raise forms.ValidationError("This address already exists.")
+            # Check address limit for guest users
+            if guest_user.addresses.count() >= 2:
+                raise forms.ValidationError("Guest users cannot have more than 1 address.")
 
-        return cleaned_data
-
-    def clean(self):
-        cleaned_data = super().clean()
-        # Add custom validation logic if necessary
         return cleaned_data

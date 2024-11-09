@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="800px" viewBox="0 0 800 800" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g fill="#FFFFFF">
+            <circle opacity="0.1" cx="400" cy="400" r="40"/>
+            <circle opacity="0.1" cx="200" cy="200" r="20"/>
+            <circle opacity="0.1" cx="600" cy="600" r="30"/>
+            <circle opacity="0.1" cx="200" cy="600" r="25"/>
+            <circle opacity="0.1" cx="600" cy="200" r="35"/>
+            <circle opacity="0.1" cx="100" cy="400" r="15"/>
+            <circle opacity="0.1" cx="700" cy="400" r="25"/>
+            <circle opacity="0.1" cx="400" cy="100" r="20"/>
+            <circle opacity="0.1" cx="400" cy="700" r="30"/>
+        </g>
+    </g>
+</svg>

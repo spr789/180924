@@ -1,13 +1,12 @@
 from rest_framework import serializers
-from .models import CustomUser, UserProfile, Address
+from .models import CustomUser, UserProfile, Address, GuestUser
 
 # Serializer for CustomUser registration and profile details
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone_number', 'is_vendor', 'is_customer']
+        fields = ['phone_number', 'email', 'is_vendor', 'is_customer', 'is_staff', 'is_superuser']
         extra_kwargs = {
-            'username': {'required': True},
             'phone_number': {'required': True},
         }
 
@@ -18,9 +17,10 @@ class CustomUserCreationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone_number', 'password', 'password2']
+        fields = ['email', 'phone_number', 'password', 'password2']
         extra_kwargs = {
             'password': {'write_only': True},
+            'phone_number': {'validators': [CustomUser.phone_regex]},
         }
 
     # Custom validation to check if passwords match
@@ -30,20 +30,26 @@ class CustomUserCreationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        validated_data.pop('password2')
         user = CustomUser(
-            username=validated_data['username'],
+            username=validated_data['phone_number'],  # Set username to phone_number
             phone_number=validated_data['phone_number'],
             email=validated_data.get('email'),
         )
         user.set_password(validated_data['password'])
         user.save()
+        # Create associated UserProfile
+        UserProfile.objects.create(user=user)
         return user
 
 # Serializer for updating an existing user's profile
 class CustomUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone_number']
+        fields = ['email', 'phone_number']
+        extra_kwargs = {
+            'phone_number': {'validators': [CustomUser.phone_regex]},
+        }
 
 # Serializer for UserProfile model
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -51,25 +57,55 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['profile_picture', 'date_of_birth', 'gender', 'bio', 'website_url', 'timezone']
 
+# Serializer for GuestUser model
+class GuestUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GuestUser
+        fields = ['session_key', 'created_at', 'last_activity']
+        read_only_fields = ['created_at', 'last_activity']
+
 # Serializer for Address model
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = [
-            'address_line_1', 'address_line_2', 'landmark', 'city', 'state',
-            'postal_code', 'country', 'latitude', 'longitude', 'address_type', 'is_default', 'address_verified'
+            'id', 'user', 'guest_user', 'address_line_1', 'address_line_2', 'landmark', 
+            'city', 'state', 'postal_code', 'country', 'latitude', 'longitude', 
+            'address_type', 'is_default', 'address_verified'
         ]
+        read_only_fields = ['address_verified']
 
-    # Custom validation to prevent duplicate addresses
     def validate(self, data):
-        user = self.context['request'].user
-        if Address.objects.filter(
-            user=user,
-            address_line_1=data['address_line_1'],
-            city=data['city'],
-            state=data['state'],
-            postal_code=data['postal_code'],
-            country=data['country']
-        ).exists():
-            raise serializers.ValidationError("This address already exists for the user.")
+        user = data.get('user')
+        guest_user = data.get('guest_user')
+
+        # Ensure either user or guest_user is provided, but not both
+        if user and guest_user:
+            raise serializers.ValidationError("Cannot specify both user and guest user")
+        if not user and not guest_user:
+            raise serializers.ValidationError("Must specify either user or guest user")
+
+        # Check address limits
+        if user and Address.objects.filter(user=user).count() >= 4:
+            raise serializers.ValidationError("Users cannot have more than 3 addresses")
+        if guest_user and Address.objects.filter(guest_user=guest_user).count() >= 2:
+            raise serializers.ValidationError("Guest users cannot have more than 1 address")
+
+        # Check for duplicate addresses
+        address_filter = {
+            'address_line_1': data['address_line_1'],
+            'city': data['city'],
+            'state': data['state'],
+            'postal_code': data['postal_code'],
+            'country': data['country']
+        }
+
+        if user:
+            address_filter['user'] = user
+        else:
+            address_filter['guest_user'] = guest_user
+
+        if Address.objects.filter(**address_filter).exists():
+            raise serializers.ValidationError("This address already exists")
+
         return data

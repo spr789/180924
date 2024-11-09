@@ -7,3 +7,9 @@ http://127.0.0.1:8000/
 cd Frontend
 npm run dev
 http://localhost:3000
+
+git add .
+git commit -m "backend and frontend version 2"
+git push origin main
+
+
