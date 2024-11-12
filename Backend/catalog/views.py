@@ -1,58 +1,47 @@
-from django.shortcuts import render, get_object_or_404
+from rest_framework import viewsets, permissions
 from .models import Category, Collection
-from django.contrib.auth.decorators import login_required
+from .serializers import CategorySerializer, CollectionSerializer
 
-def category_list(request):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Displays a list of all active categories.
+    ViewSet for listing and retrieving categories.
     """
-    categories = Category.objects.filter(is_active=True).order_by('sort_order', 'name')
-    return render(request, 'catalog/category_list.html', {'categories': categories})
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
 
-def category_detail(request, slug):
-    category = get_object_or_404(Category, slug=slug, is_active=True)
-    subcategories = category.subcategories.filter(is_active=True).order_by('sort_order', 'name')
-    products = category.products.filter(is_active=True)  # Fetching only active products
+    def get_queryset(self):
+        return Category.objects.filter(is_active=True).order_by('sort_order', 'name')
 
-    context = {
-        'category': category,
-        'subcategories': subcategories,
-        'products': products,
-    }
-
-    return render(request, 'catalog/category_detail.html', context)
-
-def collection_list(request):
+class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Displays a list of all active collections.
+    ViewSet for listing and retrieving collections.
     """
-    collections = Collection.objects.filter(is_active=True).order_by('sort_order', 'name')
-    return render(request, 'catalog/collection_list.html', {'collections': collections})
+    serializer_class = CollectionSerializer
+    lookup_field = 'slug'
 
-def collection_detail(request, slug):
-    collection = get_object_or_404(Collection, slug=slug, is_active=True)
-    products = collection.products.filter(is_active=True)
+    def get_queryset(self):
+        return Collection.objects.filter(is_active=True).order_by('sort_order', 'name')
 
-    context = {
-        'collection': collection,
-        'products': products,
-    }
-
-    return render(request, 'catalog/collection_detail.html', context)
-
-
-@login_required
-def manage_category(request):
+class CategoryManagementViewSet(viewsets.ModelViewSet):
     """
-    Allows admin users to manage categories (CRUD operations).
+    ViewSet for managing categories (CRUD operations).
+    Requires authentication.
     """
-    categories = Category.objects.all().order_by('sort_order', 'name')
-    return render(request, 'catalog/manage_category.html', {'categories': categories})
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
 
-@login_required
-def manage_collection(request):
+    def get_queryset(self):
+        return Category.objects.all().order_by('sort_order', 'name')
+
+class CollectionManagementViewSet(viewsets.ModelViewSet):
     """
-    Allows admin users to manage collections (CRUD operations).
+    ViewSet for managing collections (CRUD operations).
+    Requires authentication.
     """
-    collections = Collection.objects.all().order_by('sort_order', 'name')
-    return render(request, 'catalog/manage_collection.html', {'collections': collections})
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CollectionSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Collection.objects.all().order_by('sort_order', 'name')

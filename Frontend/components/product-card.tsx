@@ -47,7 +47,7 @@ export function ProductCard({
           <h3 className="text-sm font-medium">{name}</h3>
         </Link>
         <p className="text-sm text-gray-600">{material}</p>
-        <p className="text-sm font-medium">₹{price.toLocaleString()}</p>
+        <p className="text-sm font-medium">₹{price?.toLocaleString() || '0'}</p>
       </div>
     </div>
   )

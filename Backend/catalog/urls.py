@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 
@@ -12,7 +12,7 @@ router.register(r'admin/collections', views.CollectionManagementViewSet, basenam
 
 urlpatterns = router.urls
 
-# Add additional URL patterns
-urlpatterns += [
-    path('api/', include(router.urls)),
-]
+# The following line is redundant since router.urls already contains these patterns
+# urlpatterns += [
+#     path('api/', include(router.urls)), 
+# ]

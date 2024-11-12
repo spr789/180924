@@ -6,13 +6,8 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
+  results: T[];
+  count: number;
 }
 
 export interface ApiError {
@@ -61,6 +56,11 @@ export interface Product {
   reviews_count: number;
   created_at: string;
   updated_at: string;
+  is_active?: boolean;
+  status?: string;
+  free_shipping?: boolean;
+  returnable?: boolean;
+  collections?: number[];
 }
 
 // Vendor Types

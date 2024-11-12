@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import SearchQuery, SearchResult, SearchIndex, FilterOption, PopularSearchTerm, AutoCompleteSuggestion
+from .models import SearchQuery, SearchResult, SearchIndex, PopularSearchTerm, AutoCompleteSuggestion
 
 class SearchResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SearchResult
-        fields = ['id', 'product', 'rank', 'relevance_score']
+        fields = ['id', 'search_query', 'product', 'rank', 'relevance_score']
 
 class SearchQuerySerializer(serializers.ModelSerializer):
     results = SearchResultSerializer(many=True, read_only=True)
@@ -17,23 +17,14 @@ class SearchQuerySerializer(serializers.ModelSerializer):
 class SearchIndexSerializer(serializers.ModelSerializer):
     class Meta:
         model = SearchIndex
-        fields = ['id', 'product', 'title', 'description', 'sku', 'price', 'discounted_price', 'keywords', 'updated_at']
-        read_only_fields = ['updated_at']
-
-class FilterOptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FilterOption
-        fields = ['id', 'name', 'type', 'value', 'is_active']
+        fields = ['id', 'product', 'title', 'description']
 
 class PopularSearchTermSerializer(serializers.ModelSerializer):
     class Meta:
         model = PopularSearchTerm
-        fields = ['id', 'term', 'search_count', 'last_searched']
-        read_only_fields = ['search_count', 'last_searched']
+        fields = ['id', 'term']
 
 class AutoCompleteSuggestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AutoCompleteSuggestion
-        fields = ['id', 'suggestion', 'relevance_score', 'created_at']
-        read_only_fields = ['created_at']
-
+        fields = ['id', 'suggestion', 'relevance_score']

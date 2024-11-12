@@ -13,5 +13,5 @@ router.register(r'guest-users', views.GuestUserViewSet, basename='guest-user')
 
 urlpatterns = [
     # Standard CRUD API endpoints via router
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]

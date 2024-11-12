@@ -1,0 +1,76 @@
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+from accounts.models import UserProfile, Address
+
+# Create vendor users
+vendor_users = []
+for i in range(5):
+    vendor_user = get_user_model().objects.create_user(
+        username=f"vendor{i}",
+        phone_number=f"+1234567{i:03d}",
+        password="vendorpass123",
+        is_vendor=True,
+        is_customer=False
+    )
+    
+    # Create UserProfile for the vendor
+    profile, created = UserProfile.objects.get_or_create(
+        user=vendor_user,
+        defaults={
+            'date_of_birth': timezone.datetime(1980 + i, 1, 1),
+            'gender': 'M' if i % 2 == 0 else 'F',
+            'bio': f"Vendor {i} selling great products",
+            'website_url': f"http://vendor{i}.com"
+        }
+    )
+
+    # Create address
+    Address.objects.create(
+        user=vendor_user,
+        address_line_1=f"{i+1} Vendor Street",
+        city="Vendorville",
+        state="VS",
+        postal_code=f"V{i+1}123",
+        country="United States",
+        address_type="work",
+        is_default=True
+    )
+    vendor_users.append(vendor_user)
+
+# Create customer users
+customer_users = []
+for i in range(5):
+    customer_user = get_user_model().objects.create_user(
+        username=f"customer{i}",
+        phone_number=f"+1987654{i:03d}",
+        password="customerpass123",
+        is_vendor=False,
+        is_customer=True
+    )
+
+    # Ensure UserProfile is created only once for each user
+    profile, created = UserProfile.objects.get_or_create(
+        user=customer_user,
+        defaults={
+            'date_of_birth': timezone.datetime(1990 + i, 6, 15),
+            'gender': 'F' if i % 2 == 0 else 'M',
+            'bio': f"Customer {i} who loves shopping"
+        }
+    )
+
+    # Create address
+    Address.objects.create(
+        user=customer_user,
+        address_line_1=f"{i+1} Customer Avenue",
+        city="Customerton",
+        state="CS",
+        postal_code=f"C{i+1}456",
+        country="United States",
+        address_type="home",
+        is_default=True
+    )
+    customer_users.append(customer_user)
+
+# Print created users
+print("Vendor Users:", [user.phone_number for user in vendor_users])
+print("Customer Users:", [user.phone_number for user in customer_users])

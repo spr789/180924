@@ -3,12 +3,12 @@ from django.dispatch import receiver
 from .models import CustomUser, UserProfile
 
 @receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    """Create a UserProfile instance when a new CustomUser is created"""
+def save_user_profile(sender, instance, created, **kwargs):
+    """
+    Create or update a UserProfile instance when a CustomUser is created or updated
+    """
     if created:
         UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    """Save the UserProfile instance whenever CustomUser is saved"""
-    instance.userprofile.save() 
+    else:
+        # Get or create the profile if it doesn't exist
+        UserProfile.objects.get_or_create(user=instance)

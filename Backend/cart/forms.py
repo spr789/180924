@@ -1,72 +1,68 @@
 from django import forms
-from .models import cart, cartItem, Abandonedcart, AbandonedcartItem
+from .models import Cart, CartItem, AbandonedCart, AbandonedCartItem
 from accounts.models import Address
 
-# cart form
-class cartForm(forms.ModelForm):
+# Cart form
+class CartForm(forms.ModelForm):
     class Meta:
-        model = cart
+        model = Cart
         fields = ['user', 'session_id', 'is_active', 'is_abandoned', 'reminder_sent', 'recovered']
 
-# cartItem form
-class cartItemForm(forms.ModelForm):
+# CartItem form 
+class CartItemForm(forms.ModelForm):
     class Meta:
-        model = cartItem
+        model = CartItem
         fields = ['cart', 'product', 'quantity']
 
-# Abandonedcart form
-class AbandonedcartForm(forms.ModelForm):
+# AbandonedCart form
+class AbandonedCartForm(forms.ModelForm):
     class Meta:
-        model = Abandonedcart
+        model = AbandonedCart
         fields = ['user', 'session_id', 'shipping_address', 'billing_address', 'total_amount', 'is_recovered']
 
-# AbandonedcartItem form
-class AbandonedcartItemForm(forms.ModelForm):
+# AbandonedCartItem form
+class AbandonedCartItemForm(forms.ModelForm):
     class Meta:
-        model = AbandonedcartItem
+        model = AbandonedCartItem
         fields = ['abandoned_cart', 'product', 'quantity', 'price', 'total_price']
 
-
-
-from django import forms
-from accounts.models import Address
-
+# Checkout form for collecting shipping/billing details
 class CheckoutForm(forms.Form):
     name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Full Name',
+        'placeholder': 'Full Name'
     }))
     email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your email address',
+        'class': 'form-control', 
+        'placeholder': 'Email Address'
     }))
     phone_number = forms.CharField(max_length=15, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Phone Number',
+        'placeholder': 'Phone Number'
     }))
     address1 = forms.CharField(max_length=255, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Address Line 1',
+        'placeholder': 'Address Line 1'
     }))
     landmark = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Landmark (optional)',
+        'placeholder': 'Landmark (Optional)'
     }))
     city = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'City',
+        'placeholder': 'City'
     }))
     state = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'State',
+        'placeholder': 'State'
     }))
     pin_code = forms.CharField(max_length=20, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Postal Code',
+        'placeholder': 'Postal Code'
     }))
     country = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Country',
+        'placeholder': 'Country'
     }))
 
     def clean_email(self):
@@ -90,5 +86,3 @@ class CheckoutForm(forms.Form):
             is_default=True
         )
         return address
-
-

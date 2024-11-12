@@ -1,44 +1,44 @@
 from django import forms
-from .models import Product, ProductImage, ProductReview, ProductSpecification, BulkUpload
+from .models import Product, ProductImage, ProductReview, BulkUpload
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'name', 'slug', 'description', 'brand', 'original_price', 'discounted_price',
-            'discount_start_date', 'discount_end_date', 'category', 'collections', 'tags', 'stock',
-            'sku', 'upc', 'weight', 'dimensions', 'condition', 'shipping_cost', 'free_shipping',
-            'is_digital', 'backorder',  'warranty_period', 'returnable',
-            'is_active', 'available_from', 'available_until'
-        ]  # Exclude fields like vendor, status, average_rating, etc.
+            'name', 'description', 'brand', 'original_price', 'discounted_price',
+            'discount_start_date', 'discount_end_date', 'category', 'collections', 'tags',
+            'stock', 'sku', 'upc', 'weight', 'dimensions', 'condition', 'shipping_cost',
+            'free_shipping', 'is_digital', 'backorder', 'low_stock_threshold', 'warranty_period',
+            'returnable', 'is_active', 'available_from', 'available_until'
+        ]
         widgets = {
-            'slug': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'description': forms.Textarea(attrs={'rows': 4}),
+            'discount_start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'discount_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'available_from': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'available_until': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-
 
 class ProductImageForm(forms.ModelForm):
     class Meta:
         model = ProductImage
-        fields = ['image']  # Only include the image field
+        fields = ['image', 'alt_text']
         widgets = {
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'multiple': True}),
         }
 
-
-# ProductReview form
 class ProductReviewForm(forms.ModelForm):
     class Meta:
         model = ProductReview
-        fields = ['product', 'customer', 'rating', 'comment']
+        fields = ['rating', 'comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
 
-# ProductSpecification form
-class ProductSpecificationForm(forms.ModelForm):
-    class Meta:
-        model = ProductSpecification
-        fields = ['product', 'name', 'value']
-
-# BulkUpload form
 class BulkUploadForm(forms.ModelForm):
     class Meta:
         model = BulkUpload
-        fields = ['vendor', 'file']
+        fields = ['file']
+        widgets = {
+            'file': forms.FileInput(attrs={'accept': '.csv, .xlsx'}),
+        }

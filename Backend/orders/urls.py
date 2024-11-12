@@ -10,6 +10,6 @@ router.register(r'orders', views.OrderViewSet, basename='order')
 urlpatterns = router.urls
 
 # Add additional URL patterns
-urlpatterns += [
-    path('api/', include(router.urls)),
+urlpatterns = [
+    path('', include(router.urls)),
 ]

@@ -17,5 +17,5 @@ router.register(r'vendor-notifications', VendorNotificationViewSet, basename='ve
 router.register(r'vendor-analytics', VendorAnalyticsViewSet, basename='vendor-analytics')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]
