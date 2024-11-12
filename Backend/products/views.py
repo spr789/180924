@@ -1,168 +1,95 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Product, ProductImage, ProductReview, ProductSpecification, BulkUpload
-from .forms import ProductForm, ProductImageForm, ProductReviewForm, BulkUploadForm
-from django.views.decorators.http import require_POST
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from .models import Product, ProductImage, ProductReview, BulkUpload
+from .serializers import ProductSerializer, ProductImageSerializer, ProductReviewSerializer, BulkUploadSerializer
 from django.utils.text import slugify
 from django.db import IntegrityError
 
-def product_list(request):
+class ProductViewSet(viewsets.ModelViewSet):
     """
-    Displays a list of all active products.
+    ViewSet for viewing and editing products.
     """
-    products = Product.objects.filter(is_active=True, status='approved').order_by('name')
-    return render(request, 'products/product_list.html', {'products': products})
+    queryset = Product.objects.filter(is_active=True, status='approved')
+    serializer_class = ProductSerializer
+    lookup_field = 'slug'
 
-def product_detail(request, slug):
-    """
-    Displays the details of a specific product, including images and reviews.
-    """
-    product = get_object_or_404(Product, slug=slug, is_active=True, status='approved')
-    images = product.images.all()
-    reviews = product.reviews.all().order_by('-created_at')
-    specifications = product.specifications.all()
-    return render(request, 'products/product_detail.html', {
-        'product': product,
-        'images': images,
-        'reviews': reviews,
-        'specifications': specifications,
-    })
+    def get_queryset(self):
+        """
+        Optionally restricts the returned products by filtering against
+        query parameters in the URL.
+        """
+        queryset = Product.objects.filter(is_active=True, status='approved')
+        category = self.request.query_params.get('category', None)
+        if category:
+            queryset = queryset.filter(category__slug=category)
+        return queryset.order_by('name')
 
-@login_required
-def manage_products(request):
-    """
-    Displays a list of products for the logged-in vendor to manage.
-    """
-    products = Product.objects.filter(vendor=request.user.vendor_profile).order_by('-created_at')
-    return render(request, 'products/manage_products.html', {'products': products})
+    @action(detail=True, methods=['post'])
+    def add_image(self, request, slug=None):
+        """
+        Add an image to a product
+        """
+        product = self.get_object()
+        serializer = ProductImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(product=product)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-def generate_unique_slug(instance, new_slug=None):
-    slug = new_slug or slugify(instance.name)
-    Klass = instance.__class__
-    qs_exists = Klass.objects.filter(slug=slug).exists()
-    if qs_exists:
-        # If slug already exists, append a counter to make it unique
-        new_slug = f"{slug}-{Klass.objects.count()}"
-        return generate_unique_slug(instance, new_slug=new_slug)
-    return slug
-
-
-@login_required
-def add_product(request):
+class VendorProductViewSet(viewsets.ModelViewSet):
     """
-    Allows a vendor to add a new product.
+    ViewSet for vendors to manage their products
     """
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        image_form = ProductImageForm(request.POST, request.FILES)
-        
-        if form.is_valid() and image_form.is_valid():
-            product = form.save(commit=False)
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        """
+        Get products for the authenticated vendor
+        """
+        return Product.objects.filter(vendor=self.request.user.vendor_profile)
+
+    def perform_create(self, serializer):
+        # Generate unique slug
+        name = self.request.data.get('name')
+        slug = slugify(name)
+        count = 0
+        while Product.objects.filter(slug=slug).exists():
+            count += 1
+            slug = f"{slugify(name)}-{count}"
             
-            # Automatically assign the vendor
-            product.vendor = request.user.vendor_profile
+        serializer.save(
+            vendor=self.request.user.vendor_profile,
+            slug=slug,
+            status='pending',
+            average_rating=0.0,
+            rating_count=0
+        )
 
-            # Set default values for other required fields
-            product.status = 'pending'  # Set product status to pending approval
-            product.average_rating = 0.0  # Default rating
-            product.rating_count = 0  # Default rating count
+class ProductReviewViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for product reviews
+    """
+    queryset = ProductReview.objects.all()
+    serializer_class = ProductReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-            # Generate a unique slug for the product
-            product.slug = generate_unique_slug(product)
-            
-            try:
-                product.save()
-                
-                # Save the product image
-                product_image = image_form.save(commit=False)
-                product_image.product = product
-                product_image.save()
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
 
-                return redirect('products:manage_products')
-            except IntegrityError:
-                form.add_error(None, "An error occurred while saving the product. Please try again.")
-    else:
-        form = ProductForm()
-        image_form = ProductImageForm()
+class BulkUploadViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for bulk uploading products
+    """
+    queryset = BulkUpload.objects.all()
+    serializer_class = BulkUploadSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    return render(request, 'products/add_product.html', {'form': form, 'image_form': image_form})
+    def get_queryset(self):
+        return BulkUpload.objects.filter(vendor=self.request.user.vendor_profile)
 
-
-@login_required
-def edit_product(request, product_id):
-    """
-    Allows a vendor to edit an existing product.
-    """
-    product = get_object_or_404(Product, id=product_id, vendor=request.user.vendor_profile)
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('products:manage_products')
-    else:
-        form = ProductForm(instance=product)
-    return render(request, 'products/edit_product.html', {'form': form})
-
-@login_required
-def delete_product(request, product_id):
-    """
-    Allows a vendor to delete an existing product.
-    """
-    product = get_object_or_404(Product, id=product_id, vendor=request.user.vendor_profile)
-    if request.method == 'POST':
-        product.delete()
-        return redirect('manage_products')
-    return render(request, 'products/delete_product_confirm.html', {'product': product})
-
-@login_required
-def bulk_upload_products(request):
-    """
-    Allows a vendor to bulk upload products via a CSV or Excel file.
-    """
-    if request.method == 'POST':
-        form = BulkUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            bulk_upload = form.save(commit=False)
-            bulk_upload.vendor = request.user.vendor_profile
-            bulk_upload.save()
-            # Trigger background processing of the file here
-            return redirect('manage_products')
-    else:
-        form = BulkUploadForm()
-    
-    return render(request, 'products/bulk_upload.html', {'form': form})
-
-@login_required
-def add_product_image(request, product_id):
-    """
-    Allows a vendor to add an image to a product.
-    """
-    product = get_object_or_404(Product, id=product_id, vendor=request.user.vendor_profile)
-    if request.method == 'POST':
-        form = ProductImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            product_image = form.save(commit=False)
-            product_image.product = product
-            product_image.save()
-            return redirect('edit_product', product_id=product.id)
-    else:
-        form = ProductImageForm()
-    return render(request, 'products/add_product_image.html', {'form': form, 'product': product})
-
-def add_review(request, product_id):
-    """
-    Allows a customer to add a review to a product.
-    """
-    product = get_object_or_404(Product, id=product_id, status='approved')
-    if request.method == 'POST':
-        form = ProductReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.product = product
-            review.customer = request.user
-            review.save()
-            return redirect('product_detail', slug=product.slug)
-    else:
-        form = ProductReviewForm()
-    return render(request, 'products/add_review.html', {'form': form, 'product': product})
+    def perform_create(self, serializer):
+        serializer.save(vendor=self.request.user.vendor_profile)

@@ -1,108 +1,83 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from rest_framework import viewsets, permissions
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import Order, OrderItem, OrderStatusHistory
-from .forms import OrderForm
-from cart.models import cart
+from .serializers import OrderSerializer, OrderItemSerializer, OrderStatusHistorySerializer
 
-@login_required
-def order_list(request):
+class OrderViewSet(viewsets.ModelViewSet):
     """
-    Displays a list of all orders for the logged-in user.
+    ViewSet for managing orders
     """
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'orders/order_list.html', {'orders': orders})
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-@login_required
-def order_detail(request, order_id):
-    """
-    Displays the details of a specific order.
-    """
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    order_items = order.items.all()
-    status_history = order.status_history.all().order_by('-changed_at')
-    return render(request, 'orders/order_detail.html', {
-        'order': order,
-        'order_items': order_items,
-        'status_history': status_history,
-    })
+    def get_queryset(self):
+        """
+        Get orders for the authenticated user
+        """
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
 
-@login_required
-def create_order(request):
-    """
-    Creates a new order from the user's cart.
-    """
-    cart = get_object_or_404(cart, user=request.user, is_active=True)
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.cart = cart
-            order.total_amount = cart.get_total_price()
-            order.grand_total = order.total_amount + order.shipping_cost - order.discount + order.tax
-            order.save()
+    def perform_create(self, serializer):
+        cart = get_object_or_404(cart, user=self.request.user, is_active=True)
+        order = serializer.save(
+            user=self.request.user,
+            cart=cart,
+            total_amount=cart.get_total_price(),
+            grand_total=cart.get_total_price() + serializer.validated_data.get('shipping_cost', 0) - 
+                       serializer.validated_data.get('discount', 0) + serializer.validated_data.get('tax', 0)
+        )
 
-            # Create order items from cart items
-            for item in cart.items.all():
-                OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    price=item.get_total_price(),
-                    total_price=item.get_total_price(),
-                )
+        # Create order items from cart items
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.get_total_price(),
+                total_price=item.get_total_price()
+            )
 
-            # Mark the cart as inactive
-            cart.is_active = False
-            cart.save()
+        # Mark cart as inactive
+        cart.is_active = False
+        cart.save()
 
-            return redirect('order_detail', order_id=order.id)
-    else:
-        form = OrderForm()
-
-    return render(request, 'orders/create_order.html', {'form': form, 'cart': cart})
-
-@login_required
-def cancel_order(request, order_id):
-    """
-    Allows the user to cancel an order that has not yet been shipped.
-    """
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    if request.method == 'POST':
-        if order.status == 'pending' or order.status == 'processed':
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """
+        Cancel an order if it's pending or processed
+        """
+        order = self.get_object()
+        if order.status in ['pending', 'processed']:
             order.status = 'canceled'
             order.save()
 
-            # Record status change in history
             OrderStatusHistory.objects.create(
                 order=order,
                 status='canceled',
                 changed_by=request.user,
                 notes='Order canceled by customer'
             )
+            
+            return Response({'status': 'Order canceled successfully'})
+        return Response({'error': 'Order cannot be canceled'}, status=400)
 
-            return redirect('order_list')
-
-    return render(request, 'orders/cancel_order_confirm.html', {'order': order})
-
-@login_required
-def track_order(request, order_id):
+class OrderItemViewSet(viewsets.ModelViewSet):
     """
-    Allows the user to track the status of their order.
+    ViewSet for order items
     """
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    status_history = order.status_history.all().order_by('-changed_at')
-    return render(request, 'orders/track_order.html', {
-        'order': order,
-        'status_history': status_history,
-    })
+    serializer_class = OrderItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-from django.shortcuts import render, get_object_or_404
-from .models import Order
+    def get_queryset(self):
+        return OrderItem.objects.filter(order__user=self.request.user)
 
-def order_success(request, order_id):
+class OrderStatusHistoryViewSet(viewsets.ModelViewSet):
     """
-    Displays the order success page after a successful checkout.
+    ViewSet for order status history
     """
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/order_success.html', {'order': order})
+    serializer_class = OrderStatusHistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return OrderStatusHistory.objects.filter(order__user=self.request.user).order_by('-changed_at')

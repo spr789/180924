@@ -1,14 +1,15 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
 app_name = 'orders'
 
-urlpatterns = [
-    path('', views.order_list, name='order_list'),
-    path('<int:order_id>/', views.order_detail, name='order_detail'),
-    path('create/', views.create_order, name='create_order'),
-    path('<int:order_id>/cancel/', views.cancel_order, name='cancel_order'),
-    path('<int:order_id>/track/', views.track_order, name='track_order'),
-    path('order/success/<int:order_id>/', views.order_success, name='order_success'),
+router = DefaultRouter()
+router.register(r'orders', views.OrderViewSet, basename='order')
 
+urlpatterns = router.urls
+
+# Add additional URL patterns
+urlpatterns += [
+    path('api/', include(router.urls)),
 ]

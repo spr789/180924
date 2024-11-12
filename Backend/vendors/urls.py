@@ -1,17 +1,21 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import (
+    VendorRegisterViewSet, VendorLoginViewSet, VendorProfileViewSet,
+    VendorOrderViewSet, VendorShipmentViewSet, VendorPayoutViewSet,
+    VendorNotificationViewSet, VendorAnalyticsViewSet
+)
 
-app_name = 'vendors'
+router = DefaultRouter()
+router.register(r'vendor-register', VendorRegisterViewSet, basename='vendor-register')
+router.register(r'vendor-login', VendorLoginViewSet, basename='vendor-login')
+router.register(r'vendor-profile', VendorProfileViewSet, basename='vendor-profile')
+router.register(r'vendor-orders', VendorOrderViewSet, basename='vendor-orders')
+router.register(r'vendor-shipments', VendorShipmentViewSet, basename='vendor-shipments')
+router.register(r'vendor-payouts', VendorPayoutViewSet, basename='vendor-payouts')
+router.register(r'vendor-notifications', VendorNotificationViewSet, basename='vendor-notifications')
+router.register(r'vendor-analytics', VendorAnalyticsViewSet, basename='vendor-analytics')
 
 urlpatterns = [
-    path('register/', views.VendorRegisterView.as_view(), name='vendor_register'),
-    path('login/', views.VendorLoginView.as_view(), name='vendor_login'),
-    path('dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
-    path('profile/', views.vendor_profile, name='vendor_profile'),
-    path('orders/', views.vendor_orders, name='vendor_orders'),
-    path('orders/<int:order_id>/', views.vendor_order_detail, name='vendor_order_detail'),
-    path('shipments/', views.vendor_shipments, name='vendor_shipments'),
-    path('payouts/', views.vendor_payouts, name='vendor_payouts'),
-    path('notifications/', views.vendor_notifications, name='vendor_notifications'),
-    path('notifications/<int:notification_id>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('api/', include(router.urls)),
 ]

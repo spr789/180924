@@ -1,6 +1,5 @@
 import { HeroSection } from "@/components/hero-section"
-import { FeaturedCategories } from "@/components/featured-categories"
-import { BenefitsSection } from "@/components/benefits-section"
+import { CollectionSection } from "@/components/collection-section"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -10,8 +9,7 @@ export default function Home() {
       <Navbar />
       <main>
         <HeroSection />
-        <FeaturedCategories />
-        <BenefitsSection />
+        <CollectionSection />
       </main>
       <Footer />
     </>

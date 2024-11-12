@@ -1,13 +1,18 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 from . import views
 
 app_name = 'catalog'
 
-urlpatterns = [
-    path('categories/', views.category_list, name='category_list'),
-    path('categories/<slug:slug>/', views.category_detail, name='category_detail'),
-    path('collections/', views.collection_list, name='collection_list'),
-    path('collections/<slug:slug>/', views.collection_detail, name='collection_detail'),
-    path('manage/categories/', views.manage_category, name='manage_category'),
-    path('manage/collections/', views.manage_collection, name='manage_collection'),
+router = DefaultRouter()
+router.register(r'categories', views.CategoryViewSet, basename='category')
+router.register(r'collections', views.CollectionViewSet, basename='collection')
+router.register(r'admin/categories', views.CategoryManagementViewSet, basename='category-management')
+router.register(r'admin/collections', views.CollectionManagementViewSet, basename='collection-management')
+
+urlpatterns = router.urls
+
+# Add additional URL patterns
+urlpatterns += [
+    path('api/', include(router.urls)),
 ]

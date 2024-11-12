@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "backend and frontend version 2"
+git commit -m "frontend V12"
 git push origin main
 
 

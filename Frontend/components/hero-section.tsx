@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export function HeroSection() {
   return (
-    <section className="relative h-[600px] flex items-center">
+    <section className="relative h-[80vh] flex items-center">
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
@@ -14,8 +14,8 @@ export function HeroSection() {
       </div>
       
       <div className="container relative z-10 text-white">
-        <h1 className="text-5xl font-bold mb-6 max-w-2xl">
-          Discover Timeless Elegance in Every Piece
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 max-w-2xl">
+          Discover Timeless Elegance
         </h1>
         <p className="text-xl mb-8 max-w-xl">
           Explore our exquisite collection of handcrafted jewelry, where tradition meets contemporary design.
