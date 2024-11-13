@@ -6,6 +6,7 @@ import { ProductsSort } from "@/components/products/products-sort"
 import { Button } from "@/components/ui/button"
 import { useProducts } from "@/lib/api/hooks/useProducts"
 import { Product } from "@/lib/api/types"
+import Link from "next/link"
 
 export function ProductsGrid() {
   const [sortBy, setSortBy] = useState("featured")
@@ -72,14 +73,15 @@ export function ProductsGrid() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              material={product.category}
-              price={product.price}
-              image={product.images[0]}
-            />
+            <Link href={`/product/${product.name}`} key={product.name}>
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                material={product.category}
+                price={product.price}
+                image={product.images[0]}
+              />
+            </Link>
           ))}
         </div>
       )}

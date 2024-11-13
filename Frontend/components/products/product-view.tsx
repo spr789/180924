@@ -8,32 +8,12 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
+import { useProducts } from "@/lib/api/hooks/useProducts"
+import { useToast } from "@/hooks/use-toast"
 
 interface ProductImage {
   src: string
   alt: string
-}
-
-// Mock product data - in a real app, this would come from an API
-const mockProduct = {
-  id: "133356",
-  name: "Antique Chain 133356",
-  price: 650,
-  rating: 4.8,
-  description: "Elevate your style with a simple and sleek look with Kushal's collection of antique chains. Made of pure quality copper alloy, this chain is efficient for everyday use. This gold-polished jewellery will elevate your traditional attire.",
-  images: [
-    {
-      src: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f",
-      alt: "Antique Chain - View 1"
-    },
-    {
-      src: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908",
-      alt: "Antique Chain - View 2"
-    }
-  ],
-  polish: "Gold",
-  length: "16 inch",
-  material: "Gold Plated"
 }
 
 export function ProductView({ productId }: { productId: string }) {
@@ -41,6 +21,18 @@ export function ProductView({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1)
   const { addItem: addToCart } = useCart()
   const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlist()
+  const { toast } = useToast()
+  const { products, loading } = useProducts()
+
+  const product = products.find(p => p.id === productId)
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (!product) {
+    return <div>Product not found</div>
+  }
 
   const handleQuantityChange = (value: number) => {
     if (value >= 1) {
@@ -50,24 +42,36 @@ export function ProductView({ productId }: { productId: string }) {
 
   const handleAddToCart = () => {
     addToCart({
-      id: mockProduct.id,
-      name: mockProduct.name,
-      price: mockProduct.price,
-      image: mockProduct.images[0].src,
-      material: mockProduct.material
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0].src,
+      material: product.material
+    })
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart`,
     })
   }
 
   const toggleWishlist = () => {
-    if (isInWishlist(mockProduct.id)) {
-      removeFromWishlist(mockProduct.id)
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id)
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.name} has been removed from your wishlist`,
+      })
     } else {
       addToWishlist({
-        id: mockProduct.id,
-        name: mockProduct.name,
-        price: mockProduct.price,
-        image: mockProduct.images[0].src,
-        material: mockProduct.material
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0].src,
+        material: product.material
+      })
+      toast({
+        title: "Added to wishlist",
+        description: `${product.name} has been added to your wishlist`,
       })
     }
   }
@@ -78,14 +82,14 @@ export function ProductView({ productId }: { productId: string }) {
       <div className="space-y-4">
         <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
           <Image
-            src={mockProduct.images[selectedImage].src}
-            alt={mockProduct.images[selectedImage].alt}
+            src={product.images[selectedImage].src}
+            alt={product.images[selectedImage].alt}
             fill
             className="object-cover"
           />
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {mockProduct.images.map((image, index) => (
+          {product.images.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
@@ -108,24 +112,24 @@ export function ProductView({ productId }: { productId: string }) {
       {/* Product Info */}
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">{mockProduct.name}</h1>
+          <h1 className="text-3xl font-bold">{product.name}</h1>
           <div className="mt-2 flex items-center">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <span
                   key={i}
-                  className={`text-${i < Math.floor(mockProduct.rating) ? 'yellow' : 'gray'}-400`}
+                  className={`text-${i < Math.floor(product.rating) ? 'yellow' : 'gray'}-400`}
                 >
                   ★
                 </span>
               ))}
             </div>
-            <span className="ml-2 text-sm text-gray-600">{mockProduct.rating}</span>
+            <span className="ml-2 text-sm text-gray-600">{product.rating}</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-2xl font-bold">₹{mockProduct.price}</p>
+          <p className="text-2xl font-bold">₹{product.price}</p>
           <p className="text-sm text-gray-600">(Incl. of all taxes)</p>
           <div className="flex items-center">
             <span className="text-green-600">Free Delivery</span>
@@ -134,14 +138,14 @@ export function ProductView({ productId }: { productId: string }) {
 
         <div className="space-y-4">
           <div>
-            <h3 className="font-medium mb-2">Polish: {mockProduct.polish}</h3>
+            <h3 className="font-medium mb-2">Polish: {product.polish}</h3>
             <div className="inline-block rounded-full w-8 h-8 bg-yellow-600"></div>
           </div>
 
           <div>
             <h3 className="font-medium mb-2">Length</h3>
             <Button variant="outline" className="rounded-full">
-              {mockProduct.length}
+              {product.length}
             </Button>
           </div>
         </div>
@@ -182,7 +186,7 @@ export function ProductView({ productId }: { productId: string }) {
             size="icon"
             onClick={toggleWishlist}
             className={cn(
-              isInWishlist(mockProduct.id) && "text-red-600 border-red-600"
+              isInWishlist(product.id) && "text-red-600 border-red-600"
             )}
           >
             <Heart className="h-5 w-5" />
@@ -197,7 +201,7 @@ export function ProductView({ productId }: { productId: string }) {
 
           <div>
             <h3 className="font-medium mb-4">Product Description</h3>
-            <p className="text-gray-600">{mockProduct.description}</p>
+            <p className="text-gray-600">{product.description}</p>
           </div>
         </div>
       </div>
