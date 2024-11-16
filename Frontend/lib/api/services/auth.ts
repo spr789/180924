@@ -1,6 +1,6 @@
 import { ApiClient } from '../client'
 import { API_ENDPOINTS } from '../config'
-import { ApiResponse, LoginCredentials, RegisterData, User } from '../types'
+import { ApiResponse, LoginCredentials, RegisterData, User, AuthResponse, PasswordResetRequest, PasswordResetConfirm } from '../types'
 
 export class AuthService {
   private client: ApiClient
@@ -9,21 +9,21 @@ export class AuthService {
     this.client = ApiClient.getInstance()
   }
 
-  async login(credentials: LoginCredentials): Promise<ApiResponse<{ token: string; user: User }>> {
-    const response = await this.client.post<ApiResponse<{ token: string; user: User }>>(
+  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.client.post<ApiResponse<AuthResponse>>(
       API_ENDPOINTS.LOGIN,
       credentials
     )
-    this.client.setToken(response.data.token)
+    this.client.setToken(response.data.access)
     return response
   }
 
-  async register(data: RegisterData): Promise<ApiResponse<{ token: string; user: User }>> {
-    const response = await this.client.post<ApiResponse<{ token: string; user: User }>>(
+  async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.client.post<ApiResponse<AuthResponse>>(
       API_ENDPOINTS.REGISTER,
       data
     )
-    this.client.setToken(response.data.token)
+    this.client.setToken(response.data.access)
     return response
   }
 
@@ -40,7 +40,15 @@ export class AuthService {
     return this.client.patch<ApiResponse<User>>(API_ENDPOINTS.PROFILE, data)
   }
 
-  async changePassword(data: { old_password: string; new_password1: string; new_password2: string }): Promise<ApiResponse<void>> {
+  async changePassword(data: { old_password: string; new_password: string }): Promise<ApiResponse<void>> {
     return this.client.post<ApiResponse<void>>(API_ENDPOINTS.PASSWORD_CHANGE, data)
+  }
+
+  async requestPasswordReset(data: PasswordResetRequest): Promise<ApiResponse<void>> {
+    return this.client.post<ApiResponse<void>>(API_ENDPOINTS.PASSWORD_RESET, data)
+  }
+
+  async confirmPasswordReset(data: PasswordResetConfirm): Promise<ApiResponse<void>> {
+    return this.client.post<ApiResponse<void>>(API_ENDPOINTS.PASSWORD_RESET, data)
   }
 }

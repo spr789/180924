@@ -16,19 +16,35 @@ export default function RegisterPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    phone_number: "",
+    username: "",
     email: "",
     password: "",
-    password2: "",
-    first_name: "",
-    last_name: "",
+    password2: "", 
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
+    if (formData.password !== formData.password2) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
     try {
-      await register(formData)
+      const registerData = {
+        phone_number: formData.phone_number,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      }
+      await register(registerData)
       toast({
         title: "Registration successful!",
         description: "Your account has been created.",
@@ -69,9 +85,9 @@ export default function RegisterPage() {
                 <div className="space-y-4">
                   <div>
                     <Input
-                      name="first_name"
-                      placeholder="First Name"
-                      value={formData.first_name}
+                      name="phone_number"
+                      placeholder="Phone Number"
+                      value={formData.phone_number}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
@@ -79,9 +95,9 @@ export default function RegisterPage() {
                   </div>
                   <div>
                     <Input
-                      name="last_name"
-                      placeholder="Last Name"
-                      value={formData.last_name}
+                      name="username"
+                      placeholder="Username"
+                      value={formData.username}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
@@ -95,7 +111,6 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
-                      required
                     />
                   </div>
                   <div>

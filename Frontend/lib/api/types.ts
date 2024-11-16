@@ -16,6 +16,58 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
+// Auth Types
+export interface User {
+  id: number;
+  phone_number: string;
+  email?: string;
+  username: string;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  is_vendor: boolean;
+  is_customer: boolean;
+  date_joined: string;
+  last_login?: string;
+  profile?: UserProfile;
+}
+
+export interface UserProfile {
+  profile_picture?: string;
+  date_of_birth?: string;
+  gender?: 'M' | 'F' | 'O';
+  bio?: string;
+  website_url?: string;
+  timezone?: string;
+}
+
+export interface AuthResponse {
+  access: string;
+  refresh: string;
+  user: User;
+}
+
+export interface LoginCredentials {
+  phone_number: string;
+  password: string;
+}
+
+export interface RegisterData {
+  phone_number: string;
+  username: string;
+  email?: string;
+  password: string;
+}
+
+export interface PasswordResetRequest {
+  phone_number: string;
+}
+
+export interface PasswordResetConfirm {
+  token: string;
+  password: string;
+}
+
 // Order Types
 export interface Order {
   id: string;
@@ -94,13 +146,18 @@ export interface Vendor {
 // Address Types
 export interface Address {
   id: number;
-  user_id: number;
-  name: string;
-  phone: string;
-  street: string;
+  user?: number;
+  guest_user?: string;
+  address_line_1: string;
+  address_line_2?: string;
+  landmark?: string;
   city: string;
   state: string;
   postal_code: string;
   country: string;
+  latitude?: number;
+  longitude?: number;
+  address_type: 'home' | 'work' | 'billing' | 'shipping';
   is_default: boolean;
+  address_verified: boolean;
 }
