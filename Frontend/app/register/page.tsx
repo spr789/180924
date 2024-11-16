@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/lib/api/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -20,17 +20,45 @@ export default function RegisterPage() {
     username: "",
     email: "",
     password: "",
-    password2: "", 
+    password2: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Form submission started"); // Debug log for form submission start
     e.preventDefault()
     setIsLoading(true)
 
+    // Validate phone number format
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/
+    if (!phoneRegex.test(formData.phone_number)) {
+      console.log("Phone number validation failed"); // Debug log for phone number validation failure
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
+    // Validate password match
     if (formData.password !== formData.password2) {
+      console.log("Password match validation failed"); // Debug log for password match validation failure
       toast({
         title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
+        description: "Please make sure your passwords match",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
+    // Validate password strength
+    if (formData.password.length < 8) {
+      console.log("Password strength validation failed"); // Debug log for password strength validation failure
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 8 characters long",
         variant: "destructive",
       })
       setIsLoading(false)
@@ -38,30 +66,24 @@ export default function RegisterPage() {
     }
 
     try {
-      const registerData = {
-        phone_number: formData.phone_number,
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      }
-      await register(registerData)
+      console.log("Attempting to register"); // Debug log for registration attempt
+      await register(formData)
+      console.log("Registration successful"); // Debug log for successful registration
       toast({
-        title: "Registration successful!",
-        description: "Your account has been created.",
+        title: "Registration successful",
+        description: "You have successfully registered.",
       })
       router.push("/")
     } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "Please check your information and try again.",
-        variant: "destructive",
-      })
+      console.error('Registration error:', error); // Debug log for registration error
+      // Toast is handled in useAuth hook
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(`Field ${e.target.name} changed to ${e.target.value}`); // Debug log for field change
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,18 +108,8 @@ export default function RegisterPage() {
                   <div>
                     <Input
                       name="phone_number"
-                      placeholder="Phone Number"
+                      placeholder="Phone Number (e.g. +1234567890)"
                       value={formData.phone_number}
-                      onChange={handleChange}
-                      className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      name="username"
-                      placeholder="Username"
-                      value={formData.username}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
@@ -107,7 +119,7 @@ export default function RegisterPage() {
                     <Input
                       name="email"
                       type="email"
-                      placeholder="Email Address"
+                      placeholder="Email Address (Optional)"
                       value={formData.email}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
@@ -117,7 +129,7 @@ export default function RegisterPage() {
                     <Input
                       name="password"
                       type="password"
-                      placeholder="Password"
+                      placeholder="Password (min. 8 characters)"
                       value={formData.password}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"

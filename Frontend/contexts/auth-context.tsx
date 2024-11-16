@@ -1,25 +1,23 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { useAuth as useAuthHook } from "@/lib/api/hooks/useAuth"
-import { User, LoginCredentials, RegisterData } from "@/lib/api/types"
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useAuth as useAuthHook } from "../lib/api/hooks/useAuth";
+import { User, LoginCredentials, RegisterData } from "../lib/api/types";
 
 interface AuthContextType {
-  user: User | null
-  loading: boolean
-  login: (credentials: LoginCredentials) => Promise<void>
-  register: (data: RegisterData) => Promise<void>
-  logout: () => Promise<void>
-  getProfile: () => Promise<User>
-  updateProfile: (data: Partial<User>) => Promise<User>
-  changePassword: (data: { old_password: string; new_password: string }) => Promise<void>
-  requestPasswordReset: (data: { phone_number: string }) => Promise<void>
-  confirmPasswordReset: (data: { token: string; password: string }) => Promise<void>
+  user: User | null;
+  loading: boolean;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  logout: () => void;
+  getProfile: () => Promise<User>;
+  updateProfile: (data: Partial<User>) => Promise<User>;
+  changePassword: (data: { old_password: string; new_password: string }) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const {
     user,
     loading,
@@ -29,18 +27,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getProfile,
     updateProfile,
     changePassword,
-    requestPasswordReset,
-    confirmPasswordReset
-  } = useAuthHook()
+  } = useAuthHook();
+
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    // Load initial profile
-    if (!user) {
-      getProfile().catch(() => {
-        // Silently fail if not authenticated
-      })
-    }
-  }, [getProfile, user])
+    // Rehydrate user on initial load
+    getProfile().finally(() => setIsInitialLoading(false));
+  }, [getProfile]);
+
+  if (isInitialLoading) {
+    return <div>Loading...</div>; // Replace with a loader/spinner as per your design
+  }
 
   return (
     <AuthContext.Provider
@@ -53,19 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         getProfile,
         updateProfile,
         changePassword,
-        requestPasswordReset,
-        confirmPasswordReset
       }}
     >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
+  return context;
+};

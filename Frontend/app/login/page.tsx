@@ -24,7 +24,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(email, password)
+      await login({ phone_number , password })
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",

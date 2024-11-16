@@ -143,6 +143,25 @@ export interface Vendor {
   created_at: string;
 }
 
+// Vendor Profile Types
+export interface VendorProfile {
+  vendor_id: string;
+  business_name: string;
+  description: string;
+  logo: string;
+  cover_image: string;
+  contact_email: string;
+  contact_phone: string;
+  social_media?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
+  address: Address;
+  created_at: string;
+  updated_at: string;
+}
+
 // Address Types
 export interface Address {
   id: number;
