@@ -163,12 +163,6 @@ SITE_ID = 1
 
 # CORS Configuration
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://supreme-chainsaw-4jg5px4gxgjrfj95j-3000.app.github.dev',  # Frontend URL on port 3000
-    'https://supreme-chainsaw-4jg5px4gxgjrfj95j-8000.app.github.dev',  # Backend API on port 8000
-    'https://supreme-chainsaw-4jg5px4gxgjrfj95j-3000.app.github.dev',  # Backend API URL
-]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -231,3 +225,10 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+INSTALLED_APPS += ['corsheaders']
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js local dev server
+]
