@@ -10,6 +10,7 @@ router.register(r'users', views.CustomUserViewSet, basename='user')
 router.register(r'profiles', views.UserProfileViewSet, basename='profile')
 router.register(r'addresses', views.AddressViewSet, basename='address')
 router.register(r'guest-users', views.GuestUserViewSet, basename='guest-user')
+router.register(r'register', views.CustomUserViewSet, basename='register')
 
 urlpatterns = [
     # Standard CRUD API endpoints via router
