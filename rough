@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "AUTH YET CONFIG..."
-git push origin master
+git commit -m "AUTH YET CONFIG not yet ready.."
+git push origin main
 
 
