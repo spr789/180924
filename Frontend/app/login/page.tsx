@@ -10,12 +10,13 @@ import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { LoginCredentials } from "@/lib/api/types" // Importing the LoginCredentials type
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
   const { toast } = useToast()
-  const [email, setEmail] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("") // Changed to phoneNumber
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
@@ -24,7 +25,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login({ phone_number , password })
+      await login({ phone_number: phoneNumber, password }) // Corrected the object structure
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
@@ -33,7 +34,7 @@ export default function LoginPage() {
     } catch (error) {
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        description: "Invalid phone number or password. Please try again.", // Updated error message
         variant: "destructive",
       })
     } finally {
@@ -74,10 +75,10 @@ export default function LoginPage() {
                 <div className="space-y-4">
                   <div>
                     <Input
-                      type="email"
-                      placeholder="Email Address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      type="text" // Changed to text for phone number
+                      placeholder="Phone Number"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
                     />

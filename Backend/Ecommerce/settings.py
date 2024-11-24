@@ -229,5 +229,7 @@ SIMPLE_JWT = {
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js local dev server
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
 ]
+

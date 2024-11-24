@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-from .forms import CustomUserCreationForm, UserProfileForm, CustomUserChangeForm, AddressForm
+from rest_framework.decorators import action
 from .models import CustomUser, UserProfile, Address, UserActivity, GuestUser
 from .serializers import (
     CustomUserSerializer, CustomUserCreationSerializer, CustomUserUpdateSerializer,
     UserProfileSerializer, AddressSerializer, GuestUserSerializer
 )
 from orders.models import Order
+from django.contrib.auth import authenticate, login, logout  # Add this import
+from rest_framework.permissions import AllowAny  # Add this import
+
+
 
 # ViewSets for API endpoints
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -45,116 +45,46 @@ class GuestUserViewSet(viewsets.ModelViewSet):
     queryset = GuestUser.objects.all()
     serializer_class = GuestUserSerializer
 
-# Core authentication views
-def register_view(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
+# API endpoint for user registration
+class RegisterViewSet(viewsets.ViewSet):
+    def create(self, request):
+        serializer = CustomUserCreationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
             UserActivity.objects.create(user=user, activity='User Registration', 
                 ip_address=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT'))
-            messages.success(request, 'Registration successful.')
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'accounts/register.html', {'form': form})
+            return Response({'message': 'Registration successful.'}, status=201)
+        return Response(serializer.errors, status=400)
 
-def login_view(request):
-    if request.method == 'POST':
-        user = authenticate(request, phone_number=request.POST.get('phone_number'), 
-                          password=request.POST.get('password'))
+# API endpoint for user login
+class LoginViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]  # Allow access without authentication
+
+    def create(self, request):
+        phone_number = request.data.get('phone_number')
+        password = request.data.get('password')
+        user = authenticate(request, phone_number=phone_number, password=password)
         if user:
             login(request, user)
-            UserActivity.objects.create(user=user, activity='Login', successful=True,
+            UserActivity.objects.create(
+                user=user,
+                activity='Login',
+                successful=True,
                 ip_address=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT'))
-            return redirect('home')
-        messages.error(request, 'Invalid credentials')
-    return render(request, 'accounts/login.html')
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
+            return Response({'message': 'Login successful.'}, status=200)
+        return Response({'error': 'Invalid credentials'}, status=400)
 
-@login_required
-def logout_view(request):
-    UserActivity.objects.create(user=request.user, activity='Logout',
-        ip_address=request.META.get('REMOTE_ADDR'),
-        user_agent=request.META.get('HTTP_USER_AGENT'))
-    logout(request)
-    return redirect('accounts:login')
+# API endpoint for user logout
+class LogoutViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
 
-# Profile management views
-@login_required
-def profile_view(request):
-    profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    orders = Order.objects.filter(user=request.user)
-    addresses = Address.objects.filter(user=request.user).order_by('-is_default')
-    return render(request, 'accounts/profile.html', 
-                 {'profile': profile, 'orders': orders, 'addresses': addresses})
-
-@login_required
-def update_profile_view(request):
-    profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        user_form = CustomUserChangeForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            UserActivity.objects.create(user=request.user, activity='Profile Update',
-                ip_address=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT'))
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts:profile')
-    else:
-        user_form = CustomUserChangeForm(instance=request.user)
-        profile_form = UserProfileForm(instance=profile)
-    return render(request, 'accounts/update_profile.html', 
-                 {'user_form': user_form, 'profile_form': profile_form})
-
-# Address management views
-@login_required
-def manage_addresses_view(request):
-    addresses = Address.objects.filter(user=request.user).order_by('-is_default')
-    return render(request, 'accounts/manage_addresses.html', {'addresses': addresses})
-
-@login_required
-def add_address_view(request):
-    if request.method == 'POST':
-        form = AddressForm(request.POST)
-        form.instance.user = request.user
-        if form.is_valid():
-            form.save()
-            UserActivity.objects.create(user=request.user, activity='Address Added',
-                ip_address=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT'))
-            messages.success(request, 'Address added successfully!')
-            return redirect('accounts:manage_addresses')
-    else:
-        form = AddressForm()
-    return render(request, 'accounts/add_address.html', {'form': form})
-
-@login_required
-def update_address_view(request, pk):
-    address = get_object_or_404(Address, pk=pk, user=request.user)
-    if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address)
-        if form.is_valid():
-            form.save()
-            UserActivity.objects.create(user=request.user, activity='Address Updated',
-                ip_address=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT'))
-            return redirect('accounts:manage_addresses')
-    else:
-        form = AddressForm(instance=address)
-    return render(request, 'accounts/update_address.html', {'form': form})
-
-@login_required
-def delete_address_view(request, pk):
-    address = get_object_or_404(Address, pk=pk, user=request.user)
-    if request.method == 'POST':
-        UserActivity.objects.create(user=request.user, activity='Address Deleted',
+    def create(self, request):
+        UserActivity.objects.create(user=request.user, activity='Logout',
             ip_address=request.META.get('REMOTE_ADDR'),
             user_agent=request.META.get('HTTP_USER_AGENT'))
-        address.delete()
-        return redirect('accounts:manage_addresses')
-    return render(request, 'accounts/delete_address.html', {'address': address})
+        logout(request)
+        return Response({'message': 'Logout successful.'}, status=200)
+

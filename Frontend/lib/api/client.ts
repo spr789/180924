@@ -77,13 +77,22 @@ export class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: data ? JSON.stringify(data) : undefined,
-    });
+    console.log('--- POST Request ---');
+    console.log('Endpoint:', endpoint);
+    console.log('Request Body:', data);
 
-    return this.handleResponse<T>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: data ? JSON.stringify(data) : undefined,
+      });
+
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      console.error('Error during POST request:', { endpoint, data, error });
+      throw error; // Re-throw the error after logging
+    }
   }
 
   async put<T>(endpoint: string, data: unknown): Promise<T> {

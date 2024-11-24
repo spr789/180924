@@ -19,7 +19,7 @@ export interface ApiError {
 // Auth Types
 export interface User {
   id: number;
-  phone_number: string;
+  phone_number: number;
   email?: string;
   username: string;
   is_active: boolean;
@@ -48,7 +48,7 @@ export interface AuthResponse {
 }
 
 export interface LoginCredentials {
-  phone_number: string;
+  phone_number: string; // Changed from number to string to match the model
   password: string;
 }
 

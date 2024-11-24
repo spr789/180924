@@ -19,14 +19,25 @@ export class AuthService {
 
   // User Authentication
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ refresh: string; access: string; user: User }>> {
-    console.log('Logging in user with credentials:', credentials);
-    const response = await this.client.post<ApiResponse<{ refresh: string; access: string; user: User }>>(
-      API_ENDPOINTS.LOGIN,
-      credentials
-    )
-    console.log('Login successful, setting token:', response.data.access);
-    this.client.setToken(response.data.access)  // Ensure the access token is set
-    return response
+    console.log('--- Login Attempt ---');
+    console.log('Input Credentials:', {
+      phone_number: credentials.phone_number,
+      password: credentials.password,
+    });
+    
+    try {
+      const response = await this.client.post<ApiResponse<{ refresh: string; access: string; user: User }>>(
+        API_ENDPOINTS.LOGIN,
+        credentials
+      );
+      console.log('Login successful! Access token received:', response.data.access);
+      this.client.setToken(response.data.access);  // Ensure the access token is set
+      console.log('Access token has been set successfully.');
+      return response;
+    } catch (error) {
+      console.error('Login failed due to an error:', error);
+      throw new Error('Login failed. Please check your credentials and try again.');
+    }
   }
 
   async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {

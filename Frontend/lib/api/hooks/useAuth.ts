@@ -12,7 +12,7 @@ export function useAuth() {
     try {
       const { data } = await authService.login(credentials);
       setUser(data.user);
-      localStorage.setItem("access_token", data.token);
+      localStorage.setItem("access_token", data.access); // Updated to use 'access' instead of 'token'
       return data.user;
     } finally {
       setLoading(false);
@@ -24,7 +24,7 @@ export function useAuth() {
     try {
       const { data: responseData } = await authService.register(data);
       setUser(responseData.user);
-      localStorage.setItem("access_token", responseData.access);
+      localStorage.setItem("access_token", responseData.access); // Updated to use 'access' instead of 'token'
       return responseData.user;
     } finally {
       setLoading(false);
@@ -47,16 +47,6 @@ export function useAuth() {
     }
   }, []);
 
-  const updateProfile = useCallback(async (profile: Partial<User>) => {
-    setLoading(true);
-    try {
-      const { data } = await authService.updateProfile(profile);
-      setUser(data);
-      return data;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const changePassword = useCallback(async (passwordData: { old_password: string; new_password: string }) => {
     setLoading(true);
@@ -74,7 +64,6 @@ export function useAuth() {
     register,
     logout,
     getProfile,
-    updateProfile,
     changePassword,
   };
 }
