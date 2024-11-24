@@ -1,6 +1,14 @@
 import { ApiClient } from '../client'
 import { API_ENDPOINTS } from '../config'
-import { ApiResponse, AuthResponse, User, PasswordResetRequest, PasswordResetConfirm, LoginCredentials, RegisterData, UserProfile, VendorProfile } from '../types'
+import { ApiResponse, User, PasswordResetRequest, PasswordResetConfirm, LoginCredentials, RegisterData, UserProfile, VendorProfile } from '../types'
+
+// Define the expected AuthResponse structure
+interface AuthResponse {
+  token: {
+    access: string;
+    refresh: string;
+  };
+}
 
 export class AuthService {
   requestPasswordReset(data: PasswordResetRequest) {
@@ -18,7 +26,7 @@ export class AuthService {
   }
 
   // User Authentication
-  async login(credentials: LoginCredentials): Promise<ApiResponse<{ refresh: string; access: string; user: User }>> {
+  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
     console.log('--- Login Attempt ---');
     console.log('Input Credentials:', {
       phone_number: credentials.phone_number,
@@ -26,29 +34,36 @@ export class AuthService {
     });
     
     try {
-      const response = await this.client.post<ApiResponse<{ refresh: string; access: string; user: User }>>(
+      const response = await this.client.post<AuthResponse>(
         API_ENDPOINTS.LOGIN,
         credentials
       );
-      console.log('Login successful! Access token received:', response.data.access);
-      this.client.setToken(response.data.access);  // Ensure the access token is set
+
+      // Check if response data is defined and contains access token
+      console.log('Response Data auth.ts:', response);
+      if (!response || !response.token || !response.token.access) { // Check for access token in response
+        throw new Error('Login failed: Access token is missing in the response auth.ts.');
+      }
+
+      console.log('Login successful! Access token received:', response.token.access);
+      this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
       console.log('Access token has been set successfully.');
-      return response;
+      return { data: response, status: 200 }; // Wrap response in ApiResponse structure
     } catch (error) {
-      console.error('Login failed due to an error:', error);
+      console.error('Login failed:', error);
       throw new Error('Login failed. Please check your credentials and try again.');
     }
   }
 
   async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
     console.log('Registering user with data:', data);
-    const response = await this.client.post<ApiResponse<AuthResponse>>(
+    const response = await this.client.post<AuthResponse>(
       API_ENDPOINTS.REGISTER,
       data
     )
-    console.log('Registration successful, setting token:', response.data.access);
-    this.client.setToken(response.data.access)  // Ensure the access token is set
-    return response
+    console.log('Registration successful, setting token:', response.token.access);
+    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
+    return { data: response, status: 200 }; // Wrap response in ApiResponse structure
   }
 
   async logout(): Promise<void> {
@@ -59,25 +74,19 @@ export class AuthService {
   }
 
   // User Profile
-  async getProfile(): Promise<any> {
-    try {
-      const token = this.client.getToken(); // Use the public getter method
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      // Fetch user profile using the token
-      return await this.client.get(API_ENDPOINTS.PROFILE);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      throw error;
+  async getProfile(): Promise<ApiResponse<UserProfile>> {
+    const token = this.client.getToken(); // Use the public getter method
+    if (!token) {
+      throw new Error('Unauthorized: Token is missing');
     }
+    console.log('Fetching user profile');
+    return await this.client.get<ApiResponse<UserProfile>>(API_ENDPOINTS.PROFILE);
   }
 
   async updateProfile(data: Partial<UserProfile>): Promise<ApiResponse<UserProfile>> {
     const token = this.client.getToken();  // Use the public getter method
     if (!token) {
-      throw new Error('Unauthorized: Token is missing')
+      throw new Error('Unauthorized: Token is missing');
     }
     console.log('Updating user profile with data:', data);
     return this.client.patch<ApiResponse<UserProfile>>(API_ENDPOINTS.PROFILE, data)
@@ -86,7 +95,7 @@ export class AuthService {
   async changePassword(data: { old_password: string; new_password: string }): Promise<ApiResponse<void>> {
     const token = this.client.getToken();  // Use the public getter method
     if (!token) {
-      throw new Error('Unauthorized: Token is missing')
+      throw new Error('Unauthorized: Token is missing');
     }
     console.log('Changing user password');
     return this.client.post<ApiResponse<void>>(API_ENDPOINTS.PASSWORD_CHANGE, data)
@@ -99,8 +108,8 @@ export class AuthService {
       API_ENDPOINTS.VENDOR_LOGIN,
       credentials
     )
-    console.log('Vendor login successful, setting token:', response.data.access);
-    this.client.setToken(response.data.access)  // Ensure the access token is set
+    console.log('Vendor login successful, setting token:', response.token.access);
+    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
     return response
   }
 
@@ -110,15 +119,15 @@ export class AuthService {
       API_ENDPOINTS.VENDOR_REGISTER,
       data
     )
-    console.log('Vendor registration successful, setting token:', response.data.access);
-    this.client.setToken(response.data.access)  // Ensure the access token is set
+    console.log('Vendor registration successful, setting token:', response.token.access);
+    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
     return response
   }
 
   async getVendorProfile(): Promise<ApiResponse<VendorProfile>> {
     const token = this.client.getToken();  // Use the public getter method
     if (!token) {
-      throw new Error('Unauthorized: Token is missing')
+      throw new Error('Unauthorized: Token is missing');
     }
     console.log('Fetching vendor profile');
     return this.client.get<ApiResponse<VendorProfile>>(API_ENDPOINTS.VENDOR_PROFILE)
@@ -127,7 +136,7 @@ export class AuthService {
   async updateVendorProfile(data: Partial<VendorProfile>): Promise<ApiResponse<VendorProfile>> {
     const token = this.client.getToken();  // Use the public getter method
     if (!token) {
-      throw new Error('Unauthorized: Token is missing')
+      throw new Error('Unauthorized: Token is missing');
     }
     console.log('Updating vendor profile with data:', data);
     return this.client.patch<ApiResponse<VendorProfile>>(API_ENDPOINTS.VENDOR_PROFILE, data)

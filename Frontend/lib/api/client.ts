@@ -1,14 +1,27 @@
 import { API_BASE_URL, DEFAULT_HEADERS } from './config';
 import { ApiError } from './types';
 
+// Define an interface for the expected response type
+interface AuthResponse {
+  token: {
+    access: string;
+    refresh: string;
+  };
+  // ... other properties if needed
+}
+
 export class ApiClient {
   private static instance: ApiClient;
-  private token: string | null = null;
+  private token: { access: string; refresh: string } | null = null;
 
   private constructor() {
     // Initialize token from localStorage if available
     if (typeof window !== 'undefined') {
-      this.token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        const parsedToken = JSON.parse(token);
+        this.token = { access: String(parsedToken.access), refresh: String(parsedToken.refresh) };
+      }
     }
   }
 
@@ -19,10 +32,10 @@ export class ApiClient {
     return ApiClient.instance;
   }
 
-  setToken(token: string) {
-    this.token = token;
+  setToken(token: { access: string; refresh: string }) {
+    this.token = { access: String(token.access), refresh: String(token.refresh) };
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_token', JSON.stringify(this.token));
     }
   }
 
@@ -33,14 +46,14 @@ export class ApiClient {
     }
   }
 
-  getToken(): string | null {
+  getToken(): { access: string; refresh: string } | null {
     return this.token;
   }
 
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = { ...DEFAULT_HEADERS };
     if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+      headers['Authorization'] = `Bearer ${this.token.access}`;
     }
     return headers;
   }
@@ -76,11 +89,7 @@ export class ApiClient {
     return this.handleResponse<T>(response);
   }
 
-  async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    console.log('--- POST Request ---');
-    console.log('Endpoint:', endpoint);
-    console.log('Request Body:', data);
-
+  async post<T extends AuthResponse>(endpoint: string, data?: unknown): Promise<T> {
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
@@ -88,7 +97,15 @@ export class ApiClient {
         body: data ? JSON.stringify(data) : undefined,
       });
 
-      return this.handleResponse<T>(response);
+      const responseData = await this.handleResponse<T>(response);
+      
+      // Log only access and refresh messages
+      if (responseData && responseData.token) {
+        console.log('Access Token:', responseData.token.access);
+        console.log('Refresh Token:', responseData.token.refresh);
+      }
+
+      return responseData;
     } catch (error) {
       console.error('Error during POST request:', { endpoint, data, error });
       throw error; // Re-throw the error after logging
