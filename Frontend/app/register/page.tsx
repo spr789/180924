@@ -66,7 +66,7 @@ export default function RegisterPage() {
         title: "Registration successful",
         description: "You have successfully registered.",
       })
-      router.push("/")
+      router.push("/account")
     } catch (error) {
       console.error('Registration error:', error);
       // Toast is handled in useAuth hook

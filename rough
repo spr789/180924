@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "AUTH login successful"
+git commit -m "AUTH registeration successful"
 git push origin main
 
 

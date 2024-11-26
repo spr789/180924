@@ -19,9 +19,8 @@ export interface ApiError {
 // Auth Types
 export interface User {
   id: number;
-  phone_number: number;
+  phone_number: string; // Changed from number to string to match the model
   email?: string;
-  username: string;
   is_active: boolean;
   is_staff: boolean;
   is_superuser: boolean;
@@ -33,12 +32,12 @@ export interface User {
 }
 
 export interface UserProfile {
-  profile_picture?: string;
-  date_of_birth?: string;
-  gender?: 'M' | 'F' | 'O';
-  bio?: string;
-  website_url?: string;
-  timezone?: string;
+  profile_picture?: string | null; // Allow null for profile_picture
+  date_of_birth?: string | null; // Allow null for date_of_birth
+  gender?: 'M' | 'F' | 'O' | null; // Allow null for gender
+  bio?: string | null; // Allow null for bio
+  website_url?: string | null; // Allow null for website_url
+  timezone?: string | null; // Allow null for timezone
 }
 
 export interface AuthResponse {
