@@ -8,7 +8,8 @@ class CustomUser(AbstractUser):
     Custom user model extending the default Django AbstractUser.
     This model uses phone_number as the unique identifier for authentication instead of username.
     """
-    email = models.EmailField(unique=False, blank=True, null=True)  # Email is optional
+    username = None  # Remove the username field
+    email = models.EmailField(unique=False, blank=True, null=True)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,12}$',
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
@@ -21,17 +22,17 @@ class CustomUser(AbstractUser):
 
     groups = models.ManyToManyField(
         'auth.Group',
-        related_name='customuser_set',  # Custom related name to avoid conflicts
+        related_name='customuser_set',
         blank=True,
     )
     user_permissions = models.ManyToManyField(
         'auth.Permission',
-        related_name='customuser_permissions_set',  # Custom related name to avoid conflicts
+        related_name='customuser_permissions_set',
         blank=True,
     )
 
-    USERNAME_FIELD = 'phone_number'  # Use phone number as the username field
-    REQUIRED_FIELDS = ['username']  # Username is still required as part of AbstractUser
+    USERNAME_FIELD = 'phone_number'  # Use phone_number as the unique identifier
+    REQUIRED_FIELDS = []  # No additional fields are required for authentication
 
     def __str__(self):
         return self.phone_number

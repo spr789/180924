@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useAuth } from "@/lib/api/hooks/useAuth"
+import { useAuth } from "@/contexts/auth-context" // Updated import to use the context
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -17,21 +17,18 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     phone_number: "",
-    username: "",
     email: "",
     password: "",
     password2: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Form submission started"); // Debug log for form submission start
     e.preventDefault()
     setIsLoading(true)
 
     // Validate phone number format
     const phoneRegex = /^\+?[1-9]\d{1,14}$/
     if (!phoneRegex.test(formData.phone_number)) {
-      console.log("Phone number validation failed"); // Debug log for phone number validation failure
       toast({
         title: "Invalid phone number",
         description: "Please enter a valid phone number",
@@ -43,7 +40,6 @@ export default function RegisterPage() {
 
     // Validate password match
     if (formData.password !== formData.password2) {
-      console.log("Password match validation failed"); // Debug log for password match validation failure
       toast({
         title: "Passwords don't match",
         description: "Please make sure your passwords match",
@@ -55,7 +51,6 @@ export default function RegisterPage() {
 
     // Validate password strength
     if (formData.password.length < 8) {
-      console.log("Password strength validation failed"); // Debug log for password strength validation failure
       toast({
         title: "Password too short",
         description: "Password must be at least 8 characters long",
@@ -66,16 +61,14 @@ export default function RegisterPage() {
     }
 
     try {
-      console.log("Attempting to register"); // Debug log for registration attempt
       await register(formData)
-      console.log("Registration successful"); // Debug log for successful registration
       toast({
         title: "Registration successful",
         description: "You have successfully registered.",
       })
       router.push("/")
     } catch (error) {
-      console.error('Registration error:', error); // Debug log for registration error
+      console.error('Registration error:', error);
       // Toast is handled in useAuth hook
     } finally {
       setIsLoading(false)
@@ -83,7 +76,6 @@ export default function RegisterPage() {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(`Field ${e.target.name} changed to ${e.target.value}`); // Debug log for field change
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,

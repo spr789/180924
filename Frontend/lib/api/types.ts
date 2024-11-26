@@ -53,10 +53,10 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-  phone_number: string;
-  username: string;
+  phone_number: string; // Changed from string to number to match the model
   email?: string;
   password: string;
+  password2: string; // Added to confirm password during registration
 }
 
 export interface PasswordResetRequest {

@@ -9,6 +9,8 @@ from .serializers import (
 from orders.models import Order
 from django.contrib.auth import authenticate, login, logout  # Add this import
 from rest_framework.permissions import AllowAny  # Add this import
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 
 
@@ -47,6 +49,8 @@ class GuestUserViewSet(viewsets.ModelViewSet):
 
 # API endpoint for user registration
 class RegisterViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]  # Allow any user to register
+
     def create(self, request):
         serializer = CustomUserCreationSerializer(data=request.data)
         if serializer.is_valid():
@@ -54,11 +58,14 @@ class RegisterViewSet(viewsets.ViewSet):
             UserActivity.objects.create(user=user, activity='User Registration', 
                 ip_address=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT'))
-            return Response({'message': 'Registration successful.'}, status=201)
+            refresh = RefreshToken.for_user(user)  # Generate token for the new user
+            return Response({
+                'message': 'Registration successful.',
+                'token': {'access': str(refresh.access_token), 'refresh': str(refresh)}
+            }, status=201)
         return Response(serializer.errors, status=400)
 
 # API endpoint for user login
-from rest_framework_simplejwt.tokens import RefreshToken
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]

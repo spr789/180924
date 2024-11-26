@@ -32,14 +32,15 @@ class CustomUserCreationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         user = CustomUser(
-            username=validated_data['phone_number'],  # Set username to phone_number
             phone_number=validated_data['phone_number'],
             email=validated_data.get('email'),
         )
         user.set_password(validated_data['password'])
         user.save()
-        # Create associated UserProfile
-        UserProfile.objects.create(user=user)
+        
+        # Check if UserProfile already exists before creating a new one
+        UserProfile.objects.get_or_create(user=user)
+        
         return user
 
 # Serializer for updating an existing user's profile
