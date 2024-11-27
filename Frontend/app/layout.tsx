@@ -1,19 +1,42 @@
 import { Inter } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/contexts/auth-context'
 import { SearchProvider } from '@/contexts/search-context'
 import { CartProvider } from '@/contexts/cart-context'
 import { WishlistProvider } from '@/contexts/wishlist-context'
 import { TopBanner } from '@/components/top-banner'
-import { Toaster } from "@/components/ui/toaster"
+import { BottomNav } from '@/components/mobile-nav/bottom-nav'
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Lumière - Exquisite Jewelry Collection',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  title: {
+    default: 'Lumière - Exquisite Jewelry Collection',
+    template: '%s | Lumière',
+  },
   description: 'Discover our collection of handcrafted jewelry where tradition meets contemporary design.',
+  keywords: ['jewelry', 'handcrafted', 'luxury', 'accessories', 'fashion'],
+  authors: [{ name: 'Lumière' }],
+  creator: 'Lumière',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Lumière - Exquisite Jewelry Collection',
+    description: 'Discover our collection of handcrafted jewelry where tradition meets contemporary design.',
+    siteName: 'Lumière',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lumière - Exquisite Jewelry Collection',
+    description: 'Discover our collection of handcrafted jewelry where tradition meets contemporary design.',
+    creator: '@lumiere',
+  },
   manifest: '/manifest.json',
   icons: [
     { rel: 'apple-touch-icon', url: '/icons/icon-192x192.png' },
@@ -35,11 +58,11 @@ export const viewport: Viewport = {
   themeColor: '#ef4444',
 }
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -67,7 +90,9 @@ export default function RootLayout({
                 <WishlistProvider>
                   <TopBanner />
                   {children}
+                  <BottomNav />
                   <Toaster />
+                  <Analytics />
                 </WishlistProvider>
               </CartProvider>
             </SearchProvider>

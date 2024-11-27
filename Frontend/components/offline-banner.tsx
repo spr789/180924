@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { Wifi, WifiOff } from 'lucide-react';
-import { usePWA } from '@/hooks/usePWA';
+import { WifiOff } from 'lucide-react'
+import { usePWA } from '@/hooks/usePWA'
 
 export function OfflineBanner() {
-  const { isOnline } = usePWA();
+  const { isOnline } = usePWA()
 
-  if (isOnline) return null;
+  if (isOnline) return null
 
   return (
     <div className="bg-yellow-500 text-white py-2 px-4 text-center">
@@ -17,5 +17,5 @@ export function OfflineBanner() {
         </span>
       </div>
     </div>
-  );
+  )
 }

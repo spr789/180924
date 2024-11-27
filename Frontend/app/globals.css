@@ -77,6 +77,13 @@
   }
 }
 
+/* Add padding to main content to account for bottom nav on mobile */
+@media (max-width: 1024px) {
+  main {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+}
+
 /* PWA specific styles */
 @media (display-mode: standalone) {
   body {

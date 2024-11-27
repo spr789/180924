@@ -1,14 +1,6 @@
 import { ApiClient } from '../client'
 import { API_ENDPOINTS } from '../config'
-import { ApiResponse, User, PasswordResetRequest, PasswordResetConfirm, LoginCredentials, RegisterData, UserProfile, VendorProfile } from '../types'
-
-// Define the expected AuthResponse structure
-interface AuthResponse {
-  token: {
-    access: string;
-    refresh: string;
-  };
-}
+import { AuthResponse, PasswordResetRequest, PasswordResetConfirm, LoginCredentials, RegisterData, UserProfile, VendorProfile } from '../types'
 
 export class AuthService {
   requestPasswordReset(data: PasswordResetRequest) {
@@ -26,44 +18,23 @@ export class AuthService {
   }
 
   // User Authentication
-  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
-    console.log('--- Login Attempt ---');
-    console.log('Input Credentials:', {
-      phone_number: credentials.phone_number,
-      password: credentials.password,
-    });
-    
-    try {
-      const response = await this.client.post<AuthResponse>(
-        API_ENDPOINTS.LOGIN,
-        credentials
-      );
-
-      // Check if response data is defined and contains access token
-      console.log('Response Data auth.ts:', response);
-      if (!response || !response.token || !response.token.access) { // Check for access token in response
-        throw new Error('Login failed: Access token is missing in the response auth.ts.');
-      }
-
-      console.log('Login successful! Access token received:', response.token.access);
-      this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
-      console.log('Access token has been set successfully.');
-      return { data: response, status: 200 }; // Wrap response in ApiResponse structure
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw new Error('Login failed. Please check your credentials and try again.');
-    }
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await this.client.post<AuthResponse>(
+      API_ENDPOINTS.LOGIN,
+      credentials
+    );
+    this.client.setToken({ access: response.access, refresh: response.refresh });
+    return response;
   }
 
-  async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
+  async register(data: RegisterData): Promise<AuthResponse> {
     console.log('Registering user with data:', data);
     const response = await this.client.post<AuthResponse>(
       API_ENDPOINTS.REGISTER,
       data
-    )
-    console.log('Registration successful, setting token:', response.token.access);
-    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
-    return { data: response, status: 200 }; // Wrap response in ApiResponse structure
+    );
+    this.client.setToken({ access: response.access, refresh: response.refresh });
+    return response;
   }
 
   async logout(): Promise<void> {
@@ -108,8 +79,8 @@ export class AuthService {
       API_ENDPOINTS.VENDOR_LOGIN,
       credentials
     )
-    console.log('Vendor login successful, setting token:', response.token.access);
-    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
+    console.log('Vendor login successful, setting token:', response.access);
+    this.client.setToken({ access: response.access, refresh: response.refresh });
     return response
   }
 
@@ -119,8 +90,8 @@ export class AuthService {
       API_ENDPOINTS.VENDOR_REGISTER,
       data
     )
-    console.log('Vendor registration successful, setting token:', response.token.access);
-    this.client.setToken({ access: response.token.access, refresh: response.token.refresh });  // Ensure the access token is set
+    console.log('Vendor registration successful, setting token:', response.access);
+    this.client.setToken({ access: response.access, refresh: response.refresh });
     return response
   }
 

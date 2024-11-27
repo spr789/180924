@@ -78,9 +78,9 @@ class LoginViewSet(viewsets.ViewSet):
                 ip_address=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT'))
             login(request, user)
             return Response({
-                               'token': {'access': str(refresh.access_token), 'refresh': str(refresh)}
+                'token': {'access': str(refresh.access_token), 'refresh': str(refresh)}
             }, status=200)
-        return Response({'error': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Invalid credentials BE', 'input': request.data }, status=400)
 
 # API endpoint for user logout
 class LogoutViewSet(viewsets.ViewSet):

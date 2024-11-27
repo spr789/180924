@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useAuth } from "@/contexts/auth-context" // Updated import to use the context
+import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -16,60 +16,30 @@ export default function RegisterPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    phone_number: "",
     email: "",
     password: "",
     password2: "",
+    first_name: "",
+    last_name: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Validate phone number format
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/
-    if (!phoneRegex.test(formData.phone_number)) {
-      toast({
-        title: "Invalid phone number",
-        description: "Please enter a valid phone number",
-        variant: "destructive",
-      })
-      setIsLoading(false)
-      return
-    }
-
-    // Validate password match
-    if (formData.password !== formData.password2) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match",
-        variant: "destructive",
-      })
-      setIsLoading(false)
-      return
-    }
-
-    // Validate password strength
-    if (formData.password.length < 8) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 8 characters long",
-        variant: "destructive",
-      })
-      setIsLoading(false)
-      return
-    }
-
     try {
       await register(formData)
       toast({
-        title: "Registration successful",
-        description: "You have successfully registered.",
+        title: "Registration successful!",
+        description: "Your account has been created.",
       })
-      router.push("/account")
+      router.push("/")
     } catch (error) {
-      console.error('Registration error:', error);
-      // Toast is handled in useAuth hook
+      toast({
+        title: "Registration failed",
+        description: "Please check your information and try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -99,9 +69,19 @@ export default function RegisterPage() {
                 <div className="space-y-4">
                   <div>
                     <Input
-                      name="phone_number"
-                      placeholder="Phone Number (e.g. +1234567890)"
-                      value={formData.phone_number}
+                      name="first_name"
+                      placeholder="First Name"
+                      value={formData.first_name}
+                      onChange={handleChange}
+                      className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      name="last_name"
+                      placeholder="Last Name"
+                      value={formData.last_name}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
@@ -111,17 +91,18 @@ export default function RegisterPage() {
                     <Input
                       name="email"
                       type="email"
-                      placeholder="Email Address (Optional)"
+                      placeholder="Email Address"
                       value={formData.email}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
+                      required
                     />
                   </div>
                   <div>
                     <Input
                       name="password"
                       type="password"
-                      placeholder="Password (min. 8 characters)"
+                      placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"

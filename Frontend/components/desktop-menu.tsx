@@ -16,6 +16,52 @@ export function DesktopMenu() {
       <NavigationMenuList className="flex items-center justify-center gap-8 py-4">
         <NavigationMenuItem>
           <NavigationMenuTrigger className="text-sm font-medium hover:text-red-600">
+            Products
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <div className="grid grid-cols-4 gap-8 p-6 w-[800px]">
+              <div className="col-span-3 grid grid-cols-3 gap-8">
+                <div>
+                  <h4 className="text-sm font-medium mb-4">Categories</h4>
+                  <ul className="space-y-2">
+                    <li><Link href="/products/jewelry" className="text-sm hover:text-red-600">Jewelry</Link></li>
+                    <li><Link href="/products/watches" className="text-sm hover:text-red-600">Watches</Link></li>
+                    <li><Link href="/products/accessories" className="text-sm hover:text-red-600">Accessories</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-4">Collections</h4>
+                  <ul className="space-y-2">
+                    <li><Link href="/products/new-arrivals" className="text-sm hover:text-red-600">New Arrivals</Link></li>
+                    <li><Link href="/products/bestsellers" className="text-sm hover:text-red-600">Bestsellers</Link></li>
+                    <li><Link href="/products/trending" className="text-sm hover:text-red-600">Trending Now</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-4">By Price</h4>
+                  <ul className="space-y-2">
+                    <li><Link href="/products/under-5000" className="text-sm hover:text-red-600">Under ₹5,000</Link></li>
+                    <li><Link href="/products/under-10000" className="text-sm hover:text-red-600">Under ₹10,000</Link></li>
+                    <li><Link href="/products/luxury" className="text-sm hover:text-red-600">Luxury</Link></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="relative h-full">
+                <img
+                  src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=2787&auto=format&fit=crop"
+                  alt="Featured Collection"
+                  className="rounded-lg object-cover h-full w-full"
+                />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <Button className="w-full bg-white/90 text-black hover:bg-white">Shop Now</Button>
+                </div>
+              </div>
+            </div>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <NavigationMenuTrigger className="text-sm font-medium hover:text-red-600">
             Necklaces
           </NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -47,7 +93,7 @@ export function DesktopMenu() {
               </div>
               <div className="relative h-full">
                 <img
-                  src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=2787&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?q=80&w=2940&auto=format&fit=crop"
                   alt="Featured Necklace"
                   className="rounded-lg object-cover h-full w-full"
                 />
@@ -59,9 +105,6 @@ export function DesktopMenu() {
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        {/* Add similar NavigationMenuItem components for other menu items */}
-        {/* For brevity, I'm showing just one example. The rest follow the same pattern */}
-        
         <NavigationMenuItem>
           <Link href="/occasions" className="text-sm font-medium hover:text-red-600">
             Occasions

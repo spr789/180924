@@ -1,28 +1,25 @@
+import axios from 'axios';
 import { API_BASE_URL, DEFAULT_HEADERS } from './config';
-import { ApiError } from './types';
-
-// Define an interface for the expected response type
-interface AuthResponse {
-  token: {
-    access: string;
-    refresh: string;
-  };
-  // ... other properties if needed
-}
+import { ApiResponse, ApiError } from './types/responses';
+import { ResponseHandler } from './utils/response-handler';
+import { setupRequestInterceptor } from './utils/request-interceptor';
+import { setupResponseInterceptor } from './utils/response-interceptor';
 
 export class ApiClient {
   private static instance: ApiClient;
   private token: { access: string; refresh: string } | null = null;
 
   private constructor() {
-    // Initialize token from localStorage if available
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');
       if (token) {
-        const parsedToken = JSON.parse(token);
-        this.token = { access: String(parsedToken.access), refresh: String(parsedToken.refresh) };
+        this.token = JSON.parse(token);
       }
     }
+
+    // Setup axios interceptors
+    setupRequestInterceptor(this);
+    setupResponseInterceptor(this);
   }
 
   static getInstance(): ApiClient {
@@ -32,10 +29,14 @@ export class ApiClient {
     return ApiClient.instance;
   }
 
+  getToken() {
+    return this.token;
+  }
+
   setToken(token: { access: string; refresh: string }) {
-    this.token = { access: String(token.access), refresh: String(token.refresh) };
+    this.token = token;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', JSON.stringify(this.token));
+      localStorage.setItem('auth_token', JSON.stringify(token));
     }
   }
 
@@ -46,98 +47,65 @@ export class ApiClient {
     }
   }
 
-  getToken(): { access: string; refresh: string } | null {
-    return this.token;
-  }
-
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = { ...DEFAULT_HEADERS };
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token.access}`;
+  async refreshToken(): Promise<{ access: string; refresh: string }> {
+    if (!this.token?.refresh) {
+      throw new Error('No refresh token available');
     }
-    return headers;
-  }
 
-  private async handleResponse<T>(response: Response): Promise<T> {
-    const data = await response.json();
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
+        refresh: this.token.refresh,
+      });
 
-    if (!response.ok) {
-      const error: ApiError = {
-        message: data.message || 'An error occurred',
-        status: response.status,
-        errors: data.errors || {}, // Default to an empty object if errors are undefined
+      const newToken = {
+        access: response.data.access,
+        refresh: this.token.refresh, // Keep existing refresh token
       };
+
+      this.setToken(newToken);
+      return newToken;
+    } catch (error) {
+      this.clearToken();
       throw error;
     }
-
-    return data;
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    const url = new URL(`${API_BASE_URL}${endpoint}`);
-    if (params) {
-      Object.keys(params).forEach(key => {
-        url.searchParams.append(key, params[key]);
-      });
-    }
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: this.getHeaders(),
-    });
-
-    return this.handleResponse<T>(response);
-  }
-
-  async post<T extends AuthResponse>(endpoint: string, data?: unknown): Promise<T> {
+  private async request<T>(
+    method: string,
+    endpoint: string,
+    config: Record<string, any> = {}
+  ): Promise<ApiResponse<T>> {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: data ? JSON.stringify(data) : undefined,
+      const response = await axios({
+        method,
+        url: `${API_BASE_URL}${endpoint}`,
+        headers: DEFAULT_HEADERS,
+        ...config,
       });
 
-      const responseData = await this.handleResponse<T>(response);
-      
-      // Log only access and refresh messages
-      if (responseData && responseData.token) {
-        console.log('Access Token:', responseData.token.access);
-        console.log('Refresh Token:', responseData.token.refresh);
-      }
-
-      return responseData;
+      return response.data;
     } catch (error) {
-      console.error('Error during POST request:', { endpoint, data, error });
-      throw error; // Re-throw the error after logging
+      return ResponseHandler.handleError(error);
     }
   }
 
-  async put<T>(endpoint: string, data: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PUT',
-      headers: this.getHeaders(),
-      body: JSON.stringify(data),
-    });
-
-    return this.handleResponse<T>(response);
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+    return this.request<T>('GET', endpoint, { params });
   }
 
-  async patch<T>(endpoint: string, data: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PATCH',
-      headers: this.getHeaders(),
-      body: JSON.stringify(data),
-    });
-
-    return this.handleResponse<T>(response);
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('POST', endpoint, { data });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-      headers: this.getHeaders(),
-    });
+  async put<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PUT', endpoint, { data });
+  }
 
-    return this.handleResponse<T>(response);
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PATCH', endpoint, { data });
+  }
+
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('DELETE', endpoint);
   }
 }

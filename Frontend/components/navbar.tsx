@@ -1,12 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
+import { Search, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ShoppingCart, User, Search, Menu, ChevronDown, Heart } from "lucide-react"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
 import { OfflineBanner } from "@/components/offline-banner"
+import { CartSheet } from "@/components/cart/cart-sheet"
 import {
   Sheet,
   SheetContent,
@@ -37,18 +37,7 @@ export function Navbar() {
             <h1 className="text-xl font-bold text-white">Lumière</h1>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" className="text-white" asChild>
-              <Link href="/wishlist">
-                <Heart className="h-6 w-6" />
-              </Link>
-            </Button>
-            <Button variant="ghost" className="text-white" asChild>
-              <Link href="/cart">
-                <ShoppingCart className="h-6 w-6" />
-              </Link>
-            </Button>
-          </div>
+          <CartSheet />
         </div>
 
         {/* Desktop Header */}
@@ -69,20 +58,8 @@ export function Navbar() {
 
           <div className="flex items-center gap-4">
             <InstallPrompt />
-            
-            <Button variant="ghost" className="text-white" asChild>
-              <Link href="/wishlist">
-                <Heart className="h-6 w-6" />
-              </Link>
-            </Button>
-
-            <Button variant="ghost" className="text-white" asChild>
-              <Link href="/cart">
-                <ShoppingCart className="h-6 w-6" />
-              </Link>
-            </Button>
-
-            <Button variant="ghost" className="text-white">
+            <CartSheet />
+            <Button variant="ghost" size="icon" className="text-white">
               <User className="h-6 w-6" />
             </Button>
           </div>
