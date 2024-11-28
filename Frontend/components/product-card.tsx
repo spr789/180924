@@ -1,16 +1,16 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import Image from "next/image"
-import { Heart } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Link from 'next/link';
+import Image from 'next/image';
+import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ProductCardProps {
-  id: string
-  name: string
-  material: string
-  price: number
-  image: string
+  id: string;
+  name: string;
+  material: string;
+  price: number;
+  image: string;
 }
 
 export function ProductCard({
@@ -18,7 +18,7 @@ export function ProductCard({
   name,
   material,
   price,
-  image
+  image,
 }: ProductCardProps) {
   return (
     <div className="group relative">
@@ -29,15 +29,15 @@ export function ProductCard({
             alt={name}
             width={500}
             height={500}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
       </Link>
-      
+
       <Button
         variant="outline"
         size="icon"
-        className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-4 top-4 bg-white/80 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
       >
         <Heart className="h-4 w-4" />
       </Button>
@@ -50,5 +50,5 @@ export function ProductCard({
         <p className="text-sm font-medium">₹{price.toLocaleString()}</p>
       </div>
     </div>
-  )
+  );
 }

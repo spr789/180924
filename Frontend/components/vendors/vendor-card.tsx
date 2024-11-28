@@ -1,26 +1,26 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Star, MapPin, Calendar } from "lucide-react"
+import Link from 'next/link';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Star, MapPin, Calendar } from 'lucide-react';
 
 interface VendorCardProps {
   vendor: {
-    id: string
-    name: string
-    category: string
-    rating: number
-    totalRatings: number
-    image: string
-    badges: string[]
-    location: string
-    joinedDate: string
-  }
+    id: string;
+    name: string;
+    category: string;
+    rating: number;
+    totalRatings: number;
+    image: string;
+    badges: string[];
+    location: string;
+    joinedDate: string;
+  };
 }
 
 export function VendorCard({ vendor }: VendorCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
       <div className="relative h-48">
         <Image
           src={vendor.image}
@@ -34,11 +34,11 @@ export function VendorCard({ vendor }: VendorCardProps) {
           <p className="text-white/90">{vendor.category}</p>
         </div>
       </div>
-      
-      <div className="p-4 space-y-4">
+
+      <div className="space-y-4 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded">
+            <div className="flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-green-700">
               <Star className="h-4 w-4 fill-current" />
               <span className="font-medium">{vendor.rating}</span>
             </div>
@@ -68,13 +68,11 @@ export function VendorCard({ vendor }: VendorCardProps) {
 
         <div className="flex gap-2">
           <Button asChild className="flex-1">
-            <Link href={`/vendor/store/${vendor.id}`}>
-              Visit Store
-            </Link>
+            <Link href={`/vendor/store/${vendor.id}`}>Visit Store</Link>
           </Button>
           <Button variant="outline">Contact</Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

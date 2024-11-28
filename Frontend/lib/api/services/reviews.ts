@@ -1,14 +1,17 @@
-import axiosInstance from '../axios';
-import { PaginatedResponse } from '../types';
+import axiosInstance from '../utils/axios';
+import { PaginatedResponse } from '../types/types';
 import { Review, ReviewCreateData } from './types/review';
 
 export class ReviewService {
-  async getProductReviews(productId: string, params?: {
-    page?: number;
-    limit?: number;
-    sort?: 'latest' | 'rating' | 'helpful';
-    rating?: number;
-  }) {
+  async getProductReviews(
+    productId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+      sort?: 'latest' | 'rating' | 'helpful';
+      rating?: number;
+    }
+  ) {
     try {
       const response = await axiosInstance.get<PaginatedResponse<Review>>(
         `/products/${productId}/reviews`,
@@ -50,7 +53,9 @@ export class ReviewService {
 
   async voteReview(reviewId: string, vote: 'helpful' | 'not_helpful') {
     try {
-      const response = await axiosInstance.post(`/reviews/${reviewId}/vote`, { vote });
+      const response = await axiosInstance.post(`/reviews/${reviewId}/vote`, {
+        vote,
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);

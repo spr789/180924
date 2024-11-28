@@ -1,14 +1,13 @@
-import axiosInstance from '../axios';
-import { Order, PaginatedResponse } from '../types';
+import axiosInstance from '../utils/axios';
+import { Order, PaginatedResponse } from '../types/types';
 
 export class OrderService {
-  async getOrders(params?: {
-    page?: number;
-    status?: string;
-    limit?: number;
-  }) {
+  async getOrders(params?: { page?: number; status?: string; limit?: number }) {
     try {
-      const response = await axiosInstance.get<PaginatedResponse<Order>>('/orders', { params });
+      const response = await axiosInstance.get<PaginatedResponse<Order>>(
+        '/orders',
+        { params }
+      );
       return response.data;
     } catch (error) {
       throw this.handleError(error);

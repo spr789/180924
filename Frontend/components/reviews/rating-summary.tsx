@@ -8,25 +8,31 @@ interface RatingSummaryProps {
   selectedRating: number | null;
 }
 
-export function RatingSummary({ stats, onRatingFilter, selectedRating }: RatingSummaryProps) {
+export function RatingSummary({
+  stats,
+  onRatingFilter,
+  selectedRating,
+}: RatingSummaryProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <div className="text-center">
-          <div className="text-4xl font-bold">{stats.average_rating.toFixed(1)}</div>
-          <div className="flex gap-1 justify-center mt-2">
+          <div className="text-4xl font-bold">
+            {stats.average_rating.toFixed(1)}
+          </div>
+          <div className="mt-2 flex justify-center gap-1">
             {[1, 2, 3, 4, 5].map((rating) => (
               <Star
                 key={rating}
-                className={`w-4 h-4 ${
+                className={`h-4 w-4 ${
                   rating <= Math.round(stats.average_rating)
-                    ? 'text-yellow-400 fill-current'
+                    ? 'fill-current text-yellow-400'
                     : 'text-gray-300'
                 }`}
               />
             ))}
           </div>
-          <div className="text-sm text-gray-600 mt-1">
+          <div className="mt-1 text-sm text-gray-600">
             {stats.total_reviews} reviews
           </div>
         </div>
@@ -39,14 +45,16 @@ export function RatingSummary({ stats, onRatingFilter, selectedRating }: RatingS
             return (
               <button
                 key={rating}
-                onClick={() => onRatingFilter(selectedRating === rating ? null : rating)}
-                className={`flex items-center gap-2 w-full group ${
+                onClick={() =>
+                  onRatingFilter(selectedRating === rating ? null : rating)
+                }
+                className={`group flex w-full items-center gap-2 ${
                   selectedRating === rating ? 'opacity-100' : 'opacity-70'
                 } hover:opacity-100`}
               >
-                <div className="flex items-center gap-1 w-16">
+                <div className="flex w-16 items-center gap-1">
                   <span>{rating}</span>
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <Star className="h-4 w-4 fill-current text-yellow-400" />
                 </div>
                 <Progress value={percentage} className="flex-1" />
                 <span className="w-12 text-sm text-gray-600">{count}</span>

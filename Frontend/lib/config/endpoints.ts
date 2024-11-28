@@ -1,0 +1,49 @@
+// /lib/api/endpoints.ts
+
+import { API_CONSTANTS } from '../api/utils/constants';
+
+// Base API endpoint
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.example.com';
+
+// Auth endpoints
+export const AUTH_ENDPOINTS = {
+  LOGIN: `${API_BASE_URL}${API_CONSTANTS.AUTH_LOGIN}`,
+  REGISTER: `${API_BASE_URL}${API_CONSTANTS.AUTH_REGISTER}`,
+  REFRESH_TOKEN: `${API_BASE_URL}${API_CONSTANTS.AUTH_REFRESH}`,
+};
+
+// Product-related endpoints
+export const PRODUCT_ENDPOINTS = {
+  GET_PRODUCTS: `${API_BASE_URL}${API_CONSTANTS.PRODUCTS_ENDPOINT}`,
+  GET_PRODUCT_DETAILS: (productId: string) => `${API_BASE_URL}${API_CONSTANTS.PRODUCTS_ENDPOINT}/${productId}`,
+  CREATE_PRODUCT: `${API_BASE_URL}${API_CONSTANTS.PRODUCTS_ENDPOINT}`,
+  UPDATE_PRODUCT: (productId: string) => `${API_BASE_URL}${API_CONSTANTS.PRODUCTS_ENDPOINT}/${productId}`,
+  DELETE_PRODUCT: (productId: string) => `${API_BASE_URL}${API_CONSTANTS.PRODUCTS_ENDPOINT}/${productId}`,
+};
+
+// Order-related endpoints
+export const ORDER_ENDPOINTS = {
+  CREATE_ORDER: `${API_BASE_URL}${API_CONSTANTS.ORDERS_ENDPOINT}`,
+  GET_ORDER: (orderId: string) => `${API_BASE_URL}${API_CONSTANTS.ORDERS_ENDPOINT}/${orderId}`,
+  GET_ALL_ORDERS: `${API_BASE_URL}${API_CONSTANTS.ORDERS_ENDPOINT}`,
+};
+
+// Review-related endpoints
+export const REVIEW_ENDPOINTS = {
+  CREATE_REVIEW: `${API_BASE_URL}${API_CONSTANTS.REVIEWS_ENDPOINT}`,
+  GET_REVIEWS: (productId: string) => `${API_BASE_URL}${API_CONSTANTS.REVIEWS_ENDPOINT}/${productId}`,
+};
+
+// Wishlist-related endpoints
+export const WISHLIST_ENDPOINTS = {
+  GET_WISHLIST: `${API_BASE_URL}${API_CONSTANTS.WISHLIST_ENDPOINT}`,
+  ADD_TO_WISHLIST: `${API_BASE_URL}${API_CONSTANTS.WISHLIST_ENDPOINT}`,
+  REMOVE_FROM_WISHLIST: (productId: string) => `${API_BASE_URL}${API_CONSTANTS.WISHLIST_ENDPOINT}/${productId}`,
+};
+
+// Vendor-related endpoints
+export const VENDOR_ENDPOINTS = {
+  GET_VENDORS: `${API_BASE_URL}${API_CONSTANTS.VENDORS_ENDPOINT}`,
+  GET_VENDOR_DETAILS: (vendorId: string) => `${API_BASE_URL}${API_CONSTANTS.VENDORS_ENDPOINT}/${vendorId}`,
+  CREATE_VENDOR: `${API_BASE_URL}${API_CONSTANTS.VENDORS_ENDPOINT}`,
+};

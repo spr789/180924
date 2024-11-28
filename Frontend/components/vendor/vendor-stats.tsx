@@ -4,12 +4,19 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { ArrowUpRight, ArrowDownRight, Package, ShoppingCart, DollarSign, Users } from "lucide-react"
+} from '@/components/ui/card';
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Package,
+  ShoppingCart,
+  DollarSign,
+  Users,
+} from 'lucide-react';
 
 export function VendorStats() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -20,7 +27,7 @@ export function VendorStats() {
           <div className="flex items-center text-sm text-green-600">
             <ArrowUpRight className="mr-1 h-4 w-4" />
             25.25%
-            <span className="text-gray-600 ml-1">from last month</span>
+            <span className="ml-1 text-gray-600">from last month</span>
           </div>
         </CardContent>
       </Card>
@@ -35,7 +42,7 @@ export function VendorStats() {
           <div className="flex items-center text-sm text-green-600">
             <ArrowUpRight className="mr-1 h-4 w-4" />
             10.25%
-            <span className="text-gray-600 ml-1">from last month</span>
+            <span className="ml-1 text-gray-600">from last month</span>
           </div>
         </CardContent>
       </Card>
@@ -50,7 +57,7 @@ export function VendorStats() {
           <div className="flex items-center text-sm text-red-600">
             <ArrowDownRight className="mr-1 h-4 w-4" />
             2.95%
-            <span className="text-gray-600 ml-1">from last month</span>
+            <span className="ml-1 text-gray-600">from last month</span>
           </div>
         </CardContent>
       </Card>
@@ -65,10 +72,10 @@ export function VendorStats() {
           <div className="flex items-center text-sm text-green-600">
             <ArrowUpRight className="mr-1 h-4 w-4" />
             15.25%
-            <span className="text-gray-600 ml-1">from last month</span>
+            <span className="ml-1 text-gray-600">from last month</span>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -9,10 +9,7 @@ export const setupResponseInterceptor = (client: ApiClient) => {
       response.data.timestamp = new Date().toISOString();
       response.data.requestId = response.config.headers['X-Request-ID'];
 
-      return ResponseHandler.formatSuccess(
-        response.data,
-        response.status
-      );
+      return ResponseHandler.formatSuccess(response.data, response.status);
     },
     async (error) => {
       // Handle token refresh

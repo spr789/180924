@@ -1,8 +1,13 @@
-type EventType = 'page_view' | 'click' | 'purchase' | 'add_to_cart' | 'remove_from_cart'
+type EventType =
+  | 'page_view'
+  | 'click'
+  | 'purchase'
+  | 'add_to_cart'
+  | 'remove_from_cart';
 
 interface AnalyticsEvent {
-  type: EventType
-  properties?: Record<string, any>
+  type: EventType;
+  properties?: Record<string, any>;
 }
 
 export const analytics = {
@@ -10,9 +15,9 @@ export const analytics = {
     if (process.env.NODE_ENV === 'production') {
       try {
         // Send to analytics service
-        console.log('Analytics event:', event)
+        console.log('Analytics event:', event);
       } catch (error) {
-        console.error('Analytics error:', error)
+        console.error('Analytics error:', error);
       }
     }
   },
@@ -21,27 +26,27 @@ export const analytics = {
     this.track({
       type: 'page_view',
       properties: { path },
-    })
+    });
   },
 
   purchase(orderId: string, amount: number): void {
     this.track({
       type: 'purchase',
       properties: { orderId, amount },
-    })
+    });
   },
 
   addToCart(productId: string, quantity: number): void {
     this.track({
       type: 'add_to_cart',
       properties: { productId, quantity },
-    })
+    });
   },
 
   removeFromCart(productId: string): void {
     this.track({
       type: 'remove_from_cart',
       properties: { productId },
-    })
+    });
   },
-}
+};

@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
+import { Metadata } from 'next';
 
 interface GenerateMetadataProps {
-  title: string
-  description?: string
-  image?: string
-  noIndex?: boolean
+  title: string;
+  description?: string;
+  image?: string;
+  noIndex?: boolean;
 }
 
 export function generateMetadata({
@@ -31,5 +31,5 @@ export function generateMetadata({
       index: !noIndex,
       follow: !noIndex,
     },
-  }
+  };
 }

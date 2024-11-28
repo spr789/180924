@@ -48,7 +48,7 @@ export class ResponseHandler {
   static handleError(error: any): never {
     const formattedError = this.formatError(error);
     console.error('[API Error]', formattedError);
-    
+
     // Log to monitoring service if available
     if (process.env.NEXT_PUBLIC_ENABLE_MONITORING === 'true') {
       // Implement error logging to your monitoring service

@@ -5,47 +5,45 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const orders = [
   {
-    id: "8924",
-    date: "16 December 2022",
-    status: "Shipped",
-    total: "₹456",
+    id: '8924',
+    date: '16 December 2022',
+    status: 'Shipped',
+    total: '₹456',
     items: [
       {
-        name: "T-shirts with multiple colors",
+        name: 'T-shirts with multiple colors',
         quantity: 2,
-        price: "₹25.98",
+        price: '₹25.98',
       },
       {
-        name: "Gaming Headset",
+        name: 'Gaming Headset',
         quantity: 2,
-        price: "₹339.90",
+        price: '₹339.90',
       },
     ],
   },
   // Add more orders as needed
-]
+];
 
 export function AccountOrders() {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Order History</CardTitle>
-        <CardDescription>
-          View and track all your orders
-        </CardDescription>
+        <CardDescription>View and track all your orders</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -83,5 +81,5 @@ export function AccountOrders() {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

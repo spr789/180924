@@ -1,19 +1,19 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useCart } from "@/contexts/cart-context"
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useCart } from '@/contexts/cart-context';
 
 interface CartSummaryProps {
-  onCheckout?: () => void
+  onCheckout?: () => void;
 }
 
 export function CartSummary({ onCheckout }: CartSummaryProps) {
-  const { totalAmount } = useCart()
+  const { totalAmount } = useCart();
 
   return (
-    <div className="border-t bg-white p-6 space-y-4">
+    <div className="space-y-4 border-t bg-white p-6">
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Subtotal</span>
@@ -30,19 +30,17 @@ export function CartSummary({ onCheckout }: CartSummaryProps) {
         </div>
       </div>
 
-      <Button 
-        asChild 
-        className="w-full h-11 text-base font-medium"
+      <Button
+        asChild
+        className="h-11 w-full text-base font-medium"
         onClick={onCheckout}
       >
-        <Link href="/checkout">
-          Proceed to Checkout
-        </Link>
+        <Link href="/checkout">Proceed to Checkout</Link>
       </Button>
 
-      <p className="text-xs text-center text-gray-500">
+      <p className="text-center text-xs text-gray-500">
         Shipping & taxes calculated at checkout
       </p>
     </div>
-  )
+  );
 }

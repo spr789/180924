@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Upload, Plus } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Upload, Plus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { BulkUploadForm } from "@/components/vendor/bulk-upload-form"
+} from '@/components/ui/dialog';
+import { BulkUploadForm } from '@/components/vendor/bulk-upload-form';
 
 export function VendorHeader() {
   return (
-    <div className="bg-white border-b">
+    <div className="border-b bg-white">
       <div className="container py-8">
         <div className="flex items-center justify-between">
           <div>
@@ -27,7 +27,7 @@ export function VendorHeader() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline">
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload className="mr-2 h-4 w-4" />
                   Bulk Upload
                 </Button>
               </DialogTrigger>
@@ -42,12 +42,12 @@ export function VendorHeader() {
               </DialogContent>
             </Dialog>
             <Button>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

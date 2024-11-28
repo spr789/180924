@@ -1,46 +1,46 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from '@/components/ui/accordion';
 
 export function ProductsFilters() {
-  const [priceRange, setPriceRange] = useState([0, 200000])
+  const [priceRange, setPriceRange] = useState([0, 200000]);
 
   const categories = [
-    { id: "necklaces", label: "Necklaces" },
-    { id: "earrings", label: "Earrings" },
-    { id: "rings", label: "Rings" },
-    { id: "bracelets", label: "Bracelets" },
-  ]
+    { id: 'necklaces', label: 'Necklaces' },
+    { id: 'earrings', label: 'Earrings' },
+    { id: 'rings', label: 'Rings' },
+    { id: 'bracelets', label: 'Bracelets' },
+  ];
 
   const materials = [
-    { id: "gold", label: "Gold" },
-    { id: "silver", label: "Silver" },
-    { id: "platinum", label: "Platinum" },
-    { id: "diamond", label: "Diamond" },
-  ]
+    { id: 'gold', label: 'Gold' },
+    { id: 'silver', label: 'Silver' },
+    { id: 'platinum', label: 'Platinum' },
+    { id: 'diamond', label: 'Diamond' },
+  ];
 
   const styles = [
-    { id: "traditional", label: "Traditional" },
-    { id: "contemporary", label: "Contemporary" },
-    { id: "minimalist", label: "Minimalist" },
-    { id: "antique", label: "Antique" },
-  ]
+    { id: 'traditional', label: 'Traditional' },
+    { id: 'contemporary', label: 'Contemporary' },
+    { id: 'minimalist', label: 'Minimalist' },
+    { id: 'antique', label: 'Antique' },
+  ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
+    <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
       <div>
-        <h3 className="font-semibold mb-4">Filters</h3>
+        <h3 className="mb-4 font-semibold">Filters</h3>
         <Button variant="outline" size="sm" className="w-full">
           Clear All
         </Button>
@@ -129,5 +129,5 @@ export function ProductsFilters() {
         </AccordionItem>
       </Accordion>
     </div>
-  )
+  );
 }

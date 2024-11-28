@@ -1,76 +1,76 @@
-"use client"
+'use client';
 
-import Link from "next/link"
+import Link from 'next/link';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { ChevronRight } from "lucide-react"
+} from '@/components/ui/accordion';
+import { ChevronRight } from 'lucide-react';
 
 const menuItems = [
   {
-    title: "Necklaces",
+    title: 'Necklaces',
     submenu: {
-      byStyle: ["Chokers", "Layered", "Pendant"],
-      byMaterial: ["Gold", "Silver", "Platinum"],
-      featured: ["New Arrivals", "Bestsellers"]
-    }
+      byStyle: ['Chokers', 'Layered', 'Pendant'],
+      byMaterial: ['Gold', 'Silver', 'Platinum'],
+      featured: ['New Arrivals', 'Bestsellers'],
+    },
   },
   {
-    title: "Earrings",
+    title: 'Earrings',
     submenu: {
-      byStyle: ["Studs", "Drops", "Hoops"],
-      byMaterial: ["Gold", "Silver", "Diamond"],
-      collections: ["Traditional", "Contemporary"]
-    }
+      byStyle: ['Studs', 'Drops', 'Hoops'],
+      byMaterial: ['Gold', 'Silver', 'Diamond'],
+      collections: ['Traditional', 'Contemporary'],
+    },
   },
   {
-    title: "Bangles",
+    title: 'Bangles',
     submenu: {
-      byStyle: ["Kada", "Bracelet", "Bangle Set"],
-      byMaterial: ["Gold", "Silver", "Diamond"],
-      collections: ["Bridal", "Daily Wear"]
-    }
+      byStyle: ['Kada', 'Bracelet', 'Bangle Set'],
+      byMaterial: ['Gold', 'Silver', 'Diamond'],
+      collections: ['Bridal', 'Daily Wear'],
+    },
   },
   {
-    title: "Accessories",
+    title: 'Accessories',
     submenu: {
-      categories: ["Anklets", "Nose Pins", "Hair Accessories"],
-      collections: ["Traditional", "Modern", "Fusion"],
-      trending: ["New Arrivals", "Bestsellers"]
-    }
+      categories: ['Anklets', 'Nose Pins', 'Hair Accessories'],
+      collections: ['Traditional', 'Modern', 'Fusion'],
+      trending: ['New Arrivals', 'Bestsellers'],
+    },
   },
   {
-    title: "92.5 Silver",
+    title: '92.5 Silver',
     submenu: {
-      categories: ["Necklaces", "Earrings", "Rings"],
-      collections: ["Oxidized", "Temple", "Contemporary"],
-      featured: ["New Arrivals", "Bestsellers"]
-    }
+      categories: ['Necklaces', 'Earrings', 'Rings'],
+      collections: ['Oxidized', 'Temple', 'Contemporary'],
+      featured: ['New Arrivals', 'Bestsellers'],
+    },
   },
   {
-    title: "Wedding Store",
+    title: 'Wedding Store',
     submenu: {
-      byOccasion: ["Engagement", "Wedding Day", "Reception"],
-      byStyle: ["Traditional", "Contemporary", "Fusion"],
-      collections: ["Bridal Sets", "Solitaires"]
-    }
-  }
-]
+      byOccasion: ['Engagement', 'Wedding Day', 'Reception'],
+      byStyle: ['Traditional', 'Contemporary', 'Fusion'],
+      collections: ['Bridal Sets', 'Solitaires'],
+    },
+  },
+];
 
 const simpleLinks = [
-  "Occasions",
-  "Collection",
-  "Happy Customers",
-  "Become Vendor"
-]
+  'Occasions',
+  'Collection',
+  'Happy Customers',
+  'Become Vendor',
+];
 
 export function MobileMenu() {
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-6 bg-red-600">
+      <div className="bg-red-600 p-6">
         <Link href="/" className="text-2xl font-bold text-white">
           Kushals
         </Link>
@@ -87,7 +87,7 @@ export function MobileMenu() {
                 <div className="space-y-4 pl-4">
                   {Object.entries(item.submenu).map(([category, items]) => (
                     <div key={category}>
-                      <h4 className="text-sm font-medium text-gray-500 mb-2">
+                      <h4 className="mb-2 text-sm font-medium text-gray-500">
                         {category.replace(/([A-Z])/g, ' $1').trim()}
                       </h4>
                       <ul className="space-y-2">
@@ -95,7 +95,7 @@ export function MobileMenu() {
                           <li key={subItem}>
                             <Link
                               href={`/${item.title.toLowerCase()}/${subItem.toLowerCase().replace(/\s+/g, '-')}`}
-                              className="text-sm hover:text-red-600 flex items-center justify-between"
+                              className="flex items-center justify-between text-sm hover:text-red-600"
                             >
                               {subItem}
                               <ChevronRight className="h-4 w-4" />
@@ -125,5 +125,5 @@ export function MobileMenu() {
         </div>
       </div>
     </div>
-  )
+  );
 }

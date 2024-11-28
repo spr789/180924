@@ -1,29 +1,29 @@
-import { analytics } from './analytics'
+import { analytics } from './analytics';
 
 export const performance = {
   mark(name: string): void {
     if (typeof window !== 'undefined' && window.performance) {
-      window.performance.mark(name)
+      window.performance.mark(name);
       analytics.track({
         type: 'performance_mark',
         properties: { name, timestamp: Date.now() },
-      })
+      });
     }
   },
 
   measure(name: string, startMark: string, endMark: string): void {
     if (typeof window !== 'undefined' && window.performance) {
       try {
-        window.performance.measure(name, startMark, endMark)
-        const entries = window.performance.getEntriesByName(name)
-        const duration = entries[entries.length - 1]?.duration
+        window.performance.measure(name, startMark, endMark);
+        const entries = window.performance.getEntriesByName(name);
+        const duration = entries[entries.length - 1]?.duration;
 
         analytics.track({
           type: 'performance_measure',
           properties: { name, duration, startMark, endMark },
-        })
+        });
       } catch (error) {
-        console.error('Performance measurement error:', error)
+        console.error('Performance measurement error:', error);
       }
     }
   },
@@ -40,41 +40,50 @@ export const performance = {
                 value: entry.value,
                 rating: this.getRating(entry.name, entry.value),
               },
-            })
-          })
-        })
+            });
+          });
+        });
 
-        observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] })
+        observer.observe({
+          entryTypes: [
+            'largest-contentful-paint',
+            'first-input',
+            'layout-shift',
+          ],
+        });
       } catch (error) {
-        console.error('Error tracking web vitals:', error)
+        console.error('Error tracking web vitals:', error);
       }
     }
   },
 
-  private getRating(metric: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+  getRating(
+    metric: string,
+    value: number
+  ): 'good' | 'needs-improvement' | 'poor' {
     const thresholds = {
-      'LCP': [2500, 4000],
-      'FID': [100, 300],
-      'CLS': [0.1, 0.25],
-    }
+      LCP: [2500, 4000],
+      FID: [100, 300],
+      CLS: [0.1, 0.25],
+    };
 
-    const metricThresholds = thresholds[metric as keyof typeof thresholds]
-    if (!metricThresholds) return 'poor'
+    const metricThresholds = thresholds[metric as keyof typeof thresholds];
+    if (!metricThresholds) return 'poor';
 
-    if (value <= metricThresholds[0]) return 'good'
-    if (value <= metricThresholds[1]) return 'needs-improvement'
-    return 'poor'
+    if (value <= metricThresholds[0]) return 'good';
+    if (value <= metricThresholds[1]) return 'needs-improvement';
+    return 'poor';
   },
 
   clearMarks(): void {
     if (typeof window !== 'undefined' && window.performance) {
-      window.performance.clearMarks()
+      window.performance.clearMarks();
     }
   },
 
   clearMeasures(): void {
     if (typeof window !== 'undefined' && window.performance) {
-      window.performance.clearMeasures()
+      window.performance.clearMeasures();
     }
   },
-}
+};

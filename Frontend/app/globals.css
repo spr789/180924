@@ -55,7 +55,7 @@
 
 /* Center layout for all pages */
 .container {
-  @apply mx-auto px-4 max-w-7xl;
+  @apply mx-auto max-w-7xl px-4;
   width: min(100%, 1280px);
   margin-left: auto;
   margin-right: auto;
@@ -98,7 +98,8 @@
 }
 
 /* Prevent text selection on interactive elements */
-button, a {
+button,
+a {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;

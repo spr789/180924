@@ -1,60 +1,72 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import Image from "next/image"
-import { Heart, Minus, Plus, Star, Truck, Shield, RotateCcw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import { useCart } from "@/contexts/cart-context"
-import { useWishlist } from "@/hooks/use-wishlist"
-import { Product } from "@/lib/api/types"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/hooks/use-toast"
-import { AddToCartButton } from "@/components/product/add-to-cart-button"
+import { useState } from 'react';
+import Image from 'next/image';
+import {
+  Heart,
+  Minus,
+  Plus,
+  Star,
+  Truck,
+  Shield,
+  RotateCcw,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { useCart } from '@/contexts/cart-context';
+import { useWishlist } from '@/hooks/use-wishlist';
+import { Product } from '@/lib/api/types/types';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { AddToCartButton } from '@/components/product/add-to-cart-button';
 
 interface ProductViewProps {
-  product: Product
+  product: Product;
 }
 
 export function ProductView({ product }: ProductViewProps) {
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [quantity, setQuantity] = useState(1)
-  const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlist()
-  const { toast } = useToast()
-  const [isWishlistAnimating, setIsWishlistAnimating] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const {
+    addItem: addToWishlist,
+    isInWishlist,
+    removeItem: removeFromWishlist,
+  } = useWishlist();
+  const { toast } = useToast();
+  const [isWishlistAnimating, setIsWishlistAnimating] = useState(false);
 
   const handleQuantityChange = (value: number) => {
     if (value >= 1 && value <= product.stock) {
-      setQuantity(value)
+      setQuantity(value);
     }
-  }
+  };
 
   const handleWishlistClick = () => {
-    setIsWishlistAnimating(true)
-    
+    setIsWishlistAnimating(true);
+
     if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id)
+      removeFromWishlist(product.id);
     } else {
       const success = addToWishlist({
         id: product.id,
         name: product.name,
         price: product.sale_price || product.price,
         image: product.images[0],
-        material: product.category
-      })
+        material: product.category,
+      });
       if (!success) {
-        setIsWishlistAnimating(false)
-        return
+        setIsWishlistAnimating(false);
+        return;
       }
     }
 
-    setTimeout(() => setIsWishlistAnimating(false), 300)
-  }
+    setTimeout(() => setIsWishlistAnimating(false), 300);
+  };
 
   return (
-    <div className="grid md:grid-cols-2 gap-8 py-6">
+    <div className="grid gap-8 py-6 md:grid-cols-2">
       {/* Product Images */}
       <div className="space-y-4">
         <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
@@ -72,8 +84,8 @@ export function ProductView({ product }: ProductViewProps) {
               key={index}
               onClick={() => setSelectedImage(index)}
               className={cn(
-                "relative aspect-square overflow-hidden rounded-lg bg-gray-100",
-                selectedImage === index && "ring-2 ring-primary"
+                'relative aspect-square overflow-hidden rounded-lg bg-gray-100',
+                selectedImage === index && 'ring-2 ring-primary'
               )}
             >
               <Image
@@ -97,10 +109,10 @@ export function ProductView({ product }: ProductViewProps) {
                 <Star
                   key={i}
                   className={cn(
-                    "h-5 w-5",
+                    'h-5 w-5',
                     i < Math.floor(product.rating)
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
+                      ? 'fill-current text-yellow-400'
+                      : 'text-gray-300'
                   )}
                 />
               ))}
@@ -109,9 +121,7 @@ export function ProductView({ product }: ProductViewProps) {
               </span>
             </div>
             {product.stock < 10 && (
-              <Badge variant="destructive">
-                Only {product.stock} left
-              </Badge>
+              <Badge variant="destructive">Only {product.stock} left</Badge>
             )}
           </div>
         </div>
@@ -153,7 +163,7 @@ export function ProductView({ product }: ProductViewProps) {
                 max={product.stock}
                 value={quantity}
                 onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
-                className="w-16 text-center mx-2"
+                className="mx-2 w-16 text-center"
               />
               <Button
                 variant="outline"
@@ -174,27 +184,26 @@ export function ProductView({ product }: ProductViewProps) {
               }}
               className="flex-1"
             />
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="icon"
               onClick={handleWishlistClick}
               className={cn(
-                "transition-all duration-300",
-                isWishlistAnimating && "scale-110",
-                isInWishlist(product.id) && "text-red-600 border-red-600"
+                'transition-all duration-300',
+                isWishlistAnimating && 'scale-110',
+                isInWishlist(product.id) && 'border-red-600 text-red-600'
               )}
             >
-              <Heart className={cn(
-                "h-5 w-5",
-                isWishlistAnimating && "animate-ping"
-              )} />
+              <Heart
+                className={cn('h-5 w-5', isWishlistAnimating && 'animate-ping')}
+              />
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="flex items-center gap-2 text-sm">
               <Truck className="h-4 w-4" />
-              {product.free_shipping ? "Free Shipping" : "Standard Shipping"}
+              {product.free_shipping ? 'Free Shipping' : 'Standard Shipping'}
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Shield className="h-4 w-4" />
@@ -213,17 +222,19 @@ export function ProductView({ product }: ProductViewProps) {
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Product Description</h2>
-          <p className="text-gray-600 whitespace-pre-line">
+          <p className="whitespace-pre-line text-gray-600">
             {product.description}
           </p>
         </div>
 
         {product.vendor && (
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="font-semibold mb-2">Sold by {product.vendor.name}</h2>
+          <div className="rounded-lg bg-gray-50 p-4">
+            <h2 className="mb-2 font-semibold">
+              Sold by {product.vendor.name}
+            </h2>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                <Star className="h-4 w-4 fill-current text-yellow-400" />
                 <span>{product.vendor.rating}</span>
               </div>
               <span>•</span>
@@ -233,5 +244,5 @@ export function ProductView({ product }: ProductViewProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

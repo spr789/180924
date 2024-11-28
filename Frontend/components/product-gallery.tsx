@@ -1,28 +1,24 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 interface ProductGalleryProps {
-  images: string[]
+  images: string[];
 }
 
 export function ProductGallery({ images }: ProductGalleryProps) {
-  const [currentImage, setCurrentImage] = useState(0)
+  const [currentImage, setCurrentImage] = useState(0);
 
   const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % images.length)
-  }
+    setCurrentImage((prev) => (prev + 1) % images.length);
+  };
 
   const previousImage = () => {
-    setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
-  }
+    setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   return (
     <div className="space-y-4">
@@ -30,7 +26,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
         <img
           src={images[currentImage]}
           alt="Product"
-          className="w-full h-full object-cover rounded-lg"
+          className="h-full w-full rounded-lg object-cover"
         />
         <div className="absolute inset-0 flex items-center justify-between p-4">
           <Button
@@ -64,7 +60,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
             <img
               src={images[currentImage]}
               alt="Product"
-              className="w-full h-full object-contain"
+              className="h-full w-full object-contain"
             />
           </DialogContent>
         </Dialog>
@@ -74,18 +70,18 @@ export function ProductGallery({ images }: ProductGalleryProps) {
           <button
             key={index}
             onClick={() => setCurrentImage(index)}
-            className={`aspect-square rounded-lg overflow-hidden border-2 ${
-              currentImage === index ? "border-red-600" : "border-transparent"
+            className={`aspect-square overflow-hidden rounded-lg border-2 ${
+              currentImage === index ? 'border-red-600' : 'border-transparent'
             }`}
           >
             <img
               src={image}
               alt={`Product ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </button>
         ))}
       </div>
     </div>
-  )
+  );
 }

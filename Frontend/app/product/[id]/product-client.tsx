@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import { ProductView } from "@/components/product-view"
-import { Product } from "@/lib/api/types"
+import { ProductView } from '@/components/product-view';
+import { Product } from '@/lib/api/types/types';
 
 interface ProductClientProps {
-  product: Product
+  product: Product;
 }
 
 export function ProductClient({ product }: ProductClientProps) {
-  return <ProductView product={product} />
+  return <ProductView product={product} />;
 }

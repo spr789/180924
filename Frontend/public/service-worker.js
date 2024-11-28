@@ -13,7 +13,8 @@ const PRECACHE_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
       .then(() => self.skipWaiting())
   );
@@ -38,7 +39,8 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request)
         .then((response) => {
           const responseClone = response.clone();
-          caches.open(CACHE_NAME)
+          caches
+            .open(CACHE_NAME)
             .then((cache) => cache.put(event.request, responseClone));
           return response;
         })
@@ -49,17 +51,23 @@ self.addEventListener('fetch', (event) => {
 
   // Static assets strategy: Cache first, fallback to network
   event.respondWith(
-    caches.match(event.request)
+    caches
+      .match(event.request)
       .then((response) => {
         if (response) {
           return response;
         }
         return fetch(event.request).then((response) => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type !== 'basic'
+          ) {
             return response;
           }
           const responseClone = response.clone();
-          caches.open(CACHE_NAME)
+          caches
+            .open(CACHE_NAME)
             .then((cache) => cache.put(event.request, responseClone));
           return response;
         });

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useReviews } from '@/lib/api/hooks/useReviews';
@@ -22,9 +22,15 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export default function ProductReviewsPage({ params }: { params: { id: string } }) {
+export default function ProductReviewsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<'latest' | 'rating' | 'helpful'>('latest');
+  const [sortBy, setSortBy] = useState<'latest' | 'rating' | 'helpful'>(
+    'latest'
+  );
   const [page, setPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -55,7 +61,7 @@ export default function ProductReviewsPage({ params }: { params: { id: string } 
 
   return (
     <main className="container py-12">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="mx-auto max-w-4xl space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Customer Reviews</h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -86,7 +92,10 @@ export default function ProductReviewsPage({ params }: { params: { id: string } 
         )}
 
         <div className="flex justify-end">
-          <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+          <Select
+            value={sortBy}
+            onValueChange={(value: any) => setSortBy(value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
@@ -100,7 +109,7 @@ export default function ProductReviewsPage({ params }: { params: { id: string } 
 
         <div className="space-y-6">
           {loading ? (
-            <div className="text-center py-12">Loading reviews...</div>
+            <div className="py-12 text-center">Loading reviews...</div>
           ) : reviews.length > 0 ? (
             <>
               {reviews.map((review) => (
@@ -123,7 +132,7 @@ export default function ProductReviewsPage({ params }: { params: { id: string } 
               )}
             </>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="py-12 text-center text-gray-500">
               No reviews yet. Be the first to review this product!
             </div>
           )}

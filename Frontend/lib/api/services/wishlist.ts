@@ -1,13 +1,13 @@
-import axiosInstance from '../axios';
-import { Product, PaginatedResponse } from '../types';
+import axiosInstance from '../utils/axios';
+import { Product, PaginatedResponse } from '../types/types';
 
 export class WishlistService {
-  async getWishlist(params?: {
-    page?: number;
-    limit?: number;
-  }) {
+  async getWishlist(params?: { page?: number; limit?: number }) {
     try {
-      const response = await axiosInstance.get<PaginatedResponse<Product>>('/wishlist', { params });
+      const response = await axiosInstance.get<PaginatedResponse<Product>>(
+        '/wishlist',
+        { params }
+      );
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -16,7 +16,9 @@ export class WishlistService {
 
   async addToWishlist(productId: string) {
     try {
-      const response = await axiosInstance.post('/wishlist/add', { product_id: productId });
+      const response = await axiosInstance.post('/wishlist/add', {
+        product_id: productId,
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -43,7 +45,9 @@ export class WishlistService {
 
   async moveToCart(productId: string) {
     try {
-      const response = await axiosInstance.post('/wishlist/move-to-cart', { product_id: productId });
+      const response = await axiosInstance.post('/wishlist/move-to-cart', {
+        product_id: productId,
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
