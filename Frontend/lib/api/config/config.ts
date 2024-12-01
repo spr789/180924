@@ -2,10 +2,9 @@
  * Core API configuration
  */
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 10000,
-  version: '1.0.0',
-  defaultHeaders: {
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '', // Default to an empty string
+  timeout: 10000, // Default timeout in milliseconds
+  headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'X-App-Version': process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
@@ -14,7 +13,7 @@ export const API_CONFIG = {
 } as const;
 
 /**
- * HTTP Status codes used throughout the application
+ * HTTP Status codes
  */
 export const HTTP_STATUS = {
   OK: 200,

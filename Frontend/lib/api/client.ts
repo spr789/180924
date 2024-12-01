@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { API_CONFIG } from './config';
+import { API_CONFIG } from './config/config'; // Adjusted import path
 import { ApiResponse } from './types/responses';
 import { ErrorHandler } from './utils/error-handler';
 import { ResponseHandler } from './utils/response-handler';
@@ -17,7 +17,9 @@ export class ApiClient {
     this.axiosInstance = axios.create({
       baseURL: API_CONFIG.baseURL,
       timeout: API_CONFIG.timeout,
-      headers: API_CONFIG.defaultHeaders,
+      headers: {
+        ...API_CONFIG.headers, // Using headers from API_CONFIG, no need to manually add 'Content-Type'
+      },
     });
 
     this.setupInterceptors();
@@ -52,7 +54,13 @@ export class ApiClient {
 
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
-      (response) => ResponseHandler.formatSuccess(response.data, response.status),
+      (response) => {
+        const formattedData = ResponseHandler.formatSuccess(
+          response.data, 
+          response.status as 200 // Type assertion to 200
+        );
+        return { ...response, data: formattedData };
+      },
       async (error) => {
         if (error.response?.status === 401 && this.token?.refresh) {
           try {
