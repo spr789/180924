@@ -1,102 +1,60 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReviewService } from '../services/reviews';
-import { Review, ReviewCreateData, ReviewStats } from '../types/review';
-import { ApiError } from '../types/types';
+import { Review, ReviewCreateData } from '../types/review';
 import { useToast } from '@/hooks/use-toast';
 
+const reviewService = new ReviewService();
+
 export function useReviews(productId: string) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState<ReviewStats | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
-  const reviewService = new ReviewService();
+  const queryClient = useQueryClient();
 
-  const fetchReviews = useCallback(
-    async (params?: {
-      page?: number;
-      limit?: number;
-      sort?: 'latest' | 'rating' | 'helpful';
-      rating?: number;
-    }) => {
-      setLoading(true);
-      try {
-        const response = await reviewService.getProductReviews(
-          productId,
-          params
-        );
-        setReviews(response.data);
-        setTotalCount(response.meta.total);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch reviews',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [productId, toast]
-  );
+  const {
+    data: reviews,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['reviews', productId],
+    queryFn: () => reviewService.getProductReviews(productId),
+  });
 
-  const createReview = useCallback(
-    async (data: ReviewCreateData) => {
-      setLoading(true);
-      try {
-        const response = await reviewService.createReview(productId, data);
-        toast({
-          title: 'Review Submitted',
-          description: 'Thank you for your review!',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to submit review',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const createReview = useMutation({
+    mutationFn: (data: ReviewCreateData) => reviewService.createReview(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
+      toast({
+        title: 'Review submitted',
+        description: 'Your review has been submitted successfully.',
+      });
     },
-    [productId, toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const voteReview = useCallback(
-    async (reviewId: string, vote: 'helpful' | 'not_helpful') => {
-      try {
-        const response = await reviewService.voteReview(reviewId, vote);
-        setReviews((prevReviews) =>
-          prevReviews.map((review) =>
-            review.id === reviewId ? { ...review, ...response } : review
-          )
-        );
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to vote',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
+  const voteReview = useMutation({
+    mutationFn: ({ reviewId, vote }: { reviewId: string; vote: 'helpful' | 'not_helpful' }) =>
+      reviewService.voteReview(reviewId, vote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   return {
     reviews,
-    stats,
-    loading,
-    totalCount,
-    fetchReviews,
+    isLoading,
+    error,
     createReview,
     voteReview,
   };

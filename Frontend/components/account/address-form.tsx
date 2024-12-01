@@ -1,25 +1,25 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export function AddressForm() {
   const [formData, setFormData] = useState({
-    type: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
+    type: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
     isDefault: false,
-  });
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     // Handle form submission
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,9 +57,7 @@ export function AddressForm() {
           <Input
             id="state"
             value={formData.state}
-            onChange={(e) =>
-              setFormData({ ...formData, state: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
           />
         </div>
       </div>
@@ -69,9 +67,7 @@ export function AddressForm() {
         <Input
           id="zipCode"
           value={formData.zipCode}
-          onChange={(e) =>
-            setFormData({ ...formData, zipCode: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
         />
       </div>
 
@@ -90,5 +86,5 @@ export function AddressForm() {
         Save Address
       </Button>
     </form>
-  );
+  )
 }

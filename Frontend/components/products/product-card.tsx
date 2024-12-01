@@ -1,19 +1,19 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useWishlist, WishlistItem } from '@/hooks/use-wishlist';
+import { useState } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { Heart } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useWishlist, WishlistItem } from "@/hooks/use-wishlist"
 
 interface ProductCardProps {
-  id: string;
-  name: string;
-  material: string;
-  price: number;
-  image: string;
+  id: string
+  name: string
+  material: string
+  price: number
+  image: string
 }
 
 export function ProductCard({
@@ -21,15 +21,15 @@ export function ProductCard({
   name,
   material,
   price,
-  image,
+  image
 }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const { addItem, removeItem, isInWishlist } = useWishlist();
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isHovered, setIsHovered] = useState(false)
+  const { addItem, removeItem, isInWishlist } = useWishlist()
+  const [isAnimating, setIsAnimating] = useState(false)
 
   const handleWishlistClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsAnimating(true);
+    e.preventDefault()
+    setIsAnimating(true)
 
     const item: WishlistItem = {
       id,
@@ -37,24 +37,24 @@ export function ProductCard({
       price,
       image,
       material,
-    };
+    }
 
     if (isInWishlist(id)) {
-      removeItem(id);
+      removeItem(id)
     } else {
-      const success = addItem(item);
+      const success = addItem(item)
       if (!success) {
-        setIsAnimating(false);
-        return;
+        setIsAnimating(false)
+        return
       }
     }
 
     // Reset animation after it completes
-    setTimeout(() => setIsAnimating(false), 300);
-  };
+    setTimeout(() => setIsAnimating(false), 300)
+  }
 
   return (
-    <div
+    <div 
       className="group relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -66,23 +66,26 @@ export function ProductCard({
             alt={name}
             width={500}
             height={500}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       </Link>
-
+      
       <Button
         variant="outline"
         size="icon"
         onClick={handleWishlistClick}
         className={cn(
-          'absolute right-4 top-4 bg-white/80 backdrop-blur-sm transition-all duration-300',
-          isHovered ? 'opacity-100' : 'opacity-0',
-          isAnimating && 'scale-110',
-          isInWishlist(id) && 'border-red-600 text-red-600'
+          "absolute top-4 right-4 bg-white/80 backdrop-blur-sm transition-all duration-300",
+          isHovered ? "opacity-100" : "opacity-0",
+          isAnimating && "scale-110",
+          isInWishlist(id) && "text-red-600 border-red-600"
         )}
       >
-        <Heart className={cn('h-4 w-4', isAnimating && 'animate-ping')} />
+        <Heart className={cn(
+          "h-4 w-4",
+          isAnimating && "animate-ping"
+        )} />
       </Button>
 
       <div className="mt-4 space-y-1">
@@ -93,5 +96,5 @@ export function ProductCard({
         <p className="text-sm font-medium">₹{price.toLocaleString()}</p>
       </div>
     </div>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-'use client';
+"use client"
 
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 
 interface ProductSortProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: string
+  onValueChange: (value: string) => void
 }
 
 export function ProductSort({ value, onValueChange }: ProductSortProps) {
@@ -32,5 +32,5 @@ export function ProductSort({ value, onValueChange }: ProductSortProps) {
         <Label htmlFor="newest">Newest First</Label>
       </div>
     </RadioGroup>
-  );
+  )
 }

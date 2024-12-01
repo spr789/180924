@@ -1,14 +1,14 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { CreditCard, Wallet } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
+import { useState } from "react"
+import { CreditCard, Wallet } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Input } from "@/components/ui/input"
 
 export function PaymentMethods() {
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState("card")
 
   return (
     <Card>
@@ -19,12 +19,12 @@ export function PaymentMethods() {
         <RadioGroup
           value={paymentMethod}
           onValueChange={setPaymentMethod}
-          className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           <Label
             htmlFor="card"
-            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 ${
-              paymentMethod === 'card' ? 'border-primary' : 'border-gray-200'
+            className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
+              paymentMethod === "card" ? "border-primary" : "border-gray-200"
             }`}
           >
             <RadioGroupItem value="card" id="card" />
@@ -36,8 +36,8 @@ export function PaymentMethods() {
 
           <Label
             htmlFor="upi"
-            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 ${
-              paymentMethod === 'upi' ? 'border-primary' : 'border-gray-200'
+            className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
+              paymentMethod === "upi" ? "border-primary" : "border-gray-200"
             }`}
           >
             <RadioGroupItem value="upi" id="upi" />
@@ -48,7 +48,7 @@ export function PaymentMethods() {
           </Label>
         </RadioGroup>
 
-        {paymentMethod === 'card' && (
+        {paymentMethod === "card" && (
           <div className="space-y-4">
             <div>
               <Label htmlFor="cardNumber">Card Number</Label>
@@ -61,18 +61,13 @@ export function PaymentMethods() {
               </div>
               <div>
                 <Label htmlFor="cvv">CVV</Label>
-                <Input
-                  id="cvv"
-                  placeholder="123"
-                  type="password"
-                  maxLength={3}
-                />
+                <Input id="cvv" placeholder="123" type="password" maxLength={3} />
               </div>
             </div>
           </div>
         )}
 
-        {paymentMethod === 'upi' && (
+        {paymentMethod === "upi" && (
           <div className="space-y-4">
             <div>
               <Label htmlFor="upiId">UPI ID</Label>
@@ -82,5 +77,5 @@ export function PaymentMethods() {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }

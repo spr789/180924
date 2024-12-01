@@ -1,79 +1,164 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { handleApiError } from './utils/errors'; // Adjust path
-import { storage } from './utils/storage';       // Adjust path
-import { ApiResponse } from '../types/responses'; // Adjust path
+import axios, { AxiosInstance } from 'axios';
+import { API_CONFIG } from './config';
+import { ApiResponse } from './types/responses';
+import { ErrorHandler } from './utils/error-handler';
+import { ResponseHandler } from './utils/response-handler';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+/**
+ * Core API client implementation
+ * Handles all HTTP requests with proper error handling and response formatting
+ */
+export class ApiClient {
+  private static instance: ApiClient;
+  private axiosInstance: AxiosInstance;
+  private token: { access: string; refresh: string } | null = null;
 
-const client = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+  private constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: API_CONFIG.baseURL,
+      timeout: API_CONFIG.timeout,
+      headers: API_CONFIG.defaultHeaders,
+    });
 
-// Request Interceptor
-client.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
-    const token = storage.get('token');
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+    this.setupInterceptors();
+    this.loadToken();
+  }
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): ApiClient {
+    if (!ApiClient.instance) {
+      ApiClient.instance = new ApiClient();
     }
-    return config;
-  },
-  (error: AxiosError) => Promise.reject(handleApiError(error))
-);
+    return ApiClient.instance;
+  }
 
-// Response Interceptor
-client.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config;
+  /**
+   * Setup request/response interceptors
+   */
+  private setupInterceptors(): void {
+    // Request interceptor
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        if (this.token?.access) {
+          config.headers.Authorization = `Bearer ${this.token.access}`;
+        }
+        config.headers['X-Request-ID'] = crypto.randomUUID();
+        return config;
+      },
+      (error) => Promise.reject(ErrorHandler.handleError(error))
+    );
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = storage.get('refreshToken');
-        const { data } = await client.post('/auth/refresh', { refreshToken });
+    // Response interceptor
+    this.axiosInstance.interceptors.response.use(
+      (response) => ResponseHandler.formatSuccess(response.data, response.status),
+      async (error) => {
+        if (error.response?.status === 401 && this.token?.refresh) {
+          try {
+            await this.refreshToken();
+            return this.axiosInstance(error.config);
+          } catch (refreshError) {
+            this.clearToken();
+            return Promise.reject(ErrorHandler.handleError(refreshError));
+          }
+        }
+        return Promise.reject(ErrorHandler.handleError(error));
+      }
+    );
+  }
 
-        storage.set('token', data.token);
-        originalRequest.headers.Authorization = `Bearer ${data.token}`;
-
-        return client(originalRequest);
-      } catch (refreshError) {
-        storage.remove('token');
-        storage.remove('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(handleApiError(refreshError));
+  /**
+   * Load token from storage
+   */
+  private loadToken(): void {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        this.token = JSON.parse(token);
       }
     }
-
-    return Promise.reject(handleApiError(error));
   }
-);
 
-// High-level API methods
-export const ApiClient = {
-  get: async <T>(url: string, params?: Record<string, any>): Promise<ApiResponse<T>> => {
-    return client.get(url, { params }).then((res) => res.data);
-  },
+  /**
+   * Set authentication token
+   */
+  setToken(token: { access: string; refresh: string }): void {
+    this.token = token;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('auth_token', JSON.stringify(token));
+    }
+  }
 
-  post: async <T>(url: string, data?: any): Promise<ApiResponse<T>> => {
-    return client.post(url, data).then((res) => res.data);
-  },
+  /**
+   * Clear authentication token
+   */
+  clearToken(): void {
+    this.token = null;
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+    }
+  }
 
-  put: async <T>(url: string, data?: any): Promise<ApiResponse<T>> => {
-    return client.put(url, data).then((res) => res.data);
-  },
+  /**
+   * Refresh authentication token
+   */
+  async refreshToken(): Promise<{ access: string; refresh: string }> {
+    if (!this.token?.refresh) {
+      throw new Error('No refresh token available');
+    }
 
-  delete: async <T>(url: string): Promise<ApiResponse<T>> => {
-    return client.delete(url).then((res) => res.data);
-  },
-};
+    const response = await this.axiosInstance.post('/auth/refresh/', {
+      refresh: this.token.refresh,
+    });
 
-export default client;
+    const newToken = {
+      access: response.data.access,
+      refresh: this.token.refresh,
+    };
+
+    this.setToken(newToken);
+    return newToken;
+  }
+
+  /**
+   * Make HTTP request
+   */
+  private async request<T>(
+    method: string,
+    endpoint: string,
+    config: Record<string, any> = {}
+  ): Promise<ApiResponse<T>> {
+    try {
+      const response = await this.axiosInstance({
+        method,
+        url: endpoint,
+        ...config,
+      });
+      return response;
+    } catch (error) {
+      return Promise.reject(ErrorHandler.handleError(error));
+    }
+  }
+
+  // HTTP method implementations
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+    return this.request<T>('GET', endpoint, { params });
+  }
+
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('POST', endpoint, { data });
+  }
+
+  async put<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PUT', endpoint, { data });
+  }
+
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PATCH', endpoint, { data });
+  }
+
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('DELETE', endpoint);
+  }
+}

@@ -1,13 +1,13 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -15,14 +15,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card"
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -34,11 +34,11 @@ const formSchema = z.object({
   state: z.string().min(2),
   pincode: z.string().min(6),
   saveInfo: z.boolean().default(false),
-});
+})
 
 interface CheckoutFormProps {
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
-  isProcessing: boolean;
+  onSubmit: (data: z.infer<typeof formSchema>) => void
+  isProcessing: boolean
 }
 
 export function CheckoutForm({ onSubmit, isProcessing }: CheckoutFormProps) {
@@ -47,7 +47,7 @@ export function CheckoutForm({ onSubmit, isProcessing }: CheckoutFormProps) {
     defaultValues: {
       saveInfo: false,
     },
-  });
+  })
 
   return (
     <Form {...form}>
@@ -74,7 +74,7 @@ export function CheckoutForm({ onSubmit, isProcessing }: CheckoutFormProps) {
               )}
             />
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="firstName"
@@ -142,7 +142,7 @@ export function CheckoutForm({ onSubmit, isProcessing }: CheckoutFormProps) {
               )}
             />
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="city"
@@ -209,9 +209,9 @@ export function CheckoutForm({ onSubmit, isProcessing }: CheckoutFormProps) {
         </Card>
 
         <Button type="submit" className="w-full" disabled={isProcessing}>
-          {isProcessing ? 'Processing...' : 'Place Order'}
+          {isProcessing ? "Processing..." : "Place Order"}
         </Button>
       </form>
     </Form>
-  );
+  )
 }

@@ -1,17 +1,28 @@
-// Define the Product type
 export interface Product {
-    id: number;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  sale_price?: number;
+  stock: number;
+  category: string;
+  images: string[];
+  rating: number;
+  reviews_count: number;
+  vendor: {
+    id: string;
     name: string;
-    description: string;
-    price: number;
-    inStock: boolean;
+  };
+  created_at: string;
+  updated_at: string;
 }
 
-// Example function to get products
-export const getProducts = async (): Promise<Product[]> => {
-    // Placeholder for fetching products
-    return [
-        { id: 1, name: 'Product 1', description: 'Description 1', price: 100, inStock: true },
-        { id: 2, name: 'Product 2', description: 'Description 2', price: 150, inStock: false },
-    ];
-}; 
+export interface ProductFilters {
+  category?: string;
+  min_price?: number;
+  max_price?: number;
+  rating?: number;
+  sort_by?: 'price_asc' | 'price_desc' | 'newest' | 'rating';
+  page?: number;
+  limit?: number;
+}

@@ -1,70 +1,65 @@
-import { analytics } from './analytics';
+/**
+ * Performance monitoring and optimization utilities
+ */
+export class Performance {
+  private static metrics: Record<string, number> = {};
 
-export const performance = {
-  mark(name: string): void {
-    if (typeof window !== 'undefined' && window.performance) {
-      window.performance.mark(name);
-      analytics.track({
-        type: 'performance_mark',
-        properties: { name, timestamp: Date.now() },
-      });
+  /**
+   * Start timing a performance metric
+   */
+  static startMeasure(name: string): void {
+    if (typeof performance !== 'undefined') {
+      performance.mark(`${name}-start`);
     }
-  },
+  }
 
-  measure(name: string, startMark: string, endMark: string): void {
-    if (typeof window !== 'undefined' && window.performance) {
-      try {
-        window.performance.measure(name, startMark, endMark);
-        const entries = window.performance.getEntriesByName(name);
-        const duration = entries[entries.length - 1]?.duration;
-
-        analytics.track({
-          type: 'performance_measure',
-          properties: { name, duration, startMark, endMark },
-        });
-      } catch (error) {
-        console.error('Performance measurement error:', error);
-      }
+  /**
+   * End timing and record a performance metric
+   */
+  static endMeasure(name: string): number | undefined {
+    if (typeof performance !== 'undefined') {
+      performance.mark(`${name}-end`);
+      performance.measure(name, `${name}-start`, `${name}-end`);
+      
+      const entries = performance.getEntriesByName(name);
+      const duration = entries[entries.length - 1]?.duration;
+      
+      this.metrics[name] = duration;
+      return duration;
     }
-  },
+  }
 
-  trackWebVitals(): void {
+  /**
+   * Track web vitals metrics
+   */
+  static trackWebVitals(): void {
     if (typeof window !== 'undefined') {
       try {
         const observer = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
-            analytics.track({
-              type: 'web_vital',
-              properties: {
-                name: entry.name,
-                value: entry.value,
-                rating: this.getRating(entry.name, entry.value),
-              },
-            });
+            const metric = {
+              name: entry.name,
+              value: entry.value,
+              rating: this.getRating(entry.name, entry.value),
+            };
+            this.logMetric(metric);
           });
         });
 
-        observer.observe({
-          entryTypes: [
-            'largest-contentful-paint',
-            'first-input',
-            'layout-shift',
-          ],
+        observer.observe({ 
+          entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] 
         });
       } catch (error) {
         console.error('Error tracking web vitals:', error);
       }
     }
-  },
+  }
 
-  getRating(
-    metric: string,
-    value: number
-  ): 'good' | 'needs-improvement' | 'poor' {
+  private static getRating(metric: string, value: number): 'good' | 'needs-improvement' | 'poor' {
     const thresholds = {
-      LCP: [2500, 4000],
-      FID: [100, 300],
-      CLS: [0.1, 0.25],
+      'LCP': [2500, 4000],
+      'FID': [100, 300],
+      'CLS': [0.1, 0.25],
     };
 
     const metricThresholds = thresholds[metric as keyof typeof thresholds];
@@ -73,17 +68,10 @@ export const performance = {
     if (value <= metricThresholds[0]) return 'good';
     if (value <= metricThresholds[1]) return 'needs-improvement';
     return 'poor';
-  },
+  }
 
-  clearMarks(): void {
-    if (typeof window !== 'undefined' && window.performance) {
-      window.performance.clearMarks();
-    }
-  },
-
-  clearMeasures(): void {
-    if (typeof window !== 'undefined' && window.performance) {
-      window.performance.clearMeasures();
-    }
-  },
-};
+  private static logMetric(metric: any): void {
+    // Implement metric logging/reporting
+    console.log('[Performance Metric]', metric);
+  }
+}

@@ -1,69 +1,54 @@
 import { useState, useCallback } from 'react';
 import { AuthService } from '../services/auth';
-import {
-  User,
-  LoginCredentials,
-  RegisterData,
-  PasswordResetRequest,
-  PasswordResetConfirm,
-} from '../types/types';
+import { User, LoginCredentials, RegisterData } from '../types/auth';
+import { useToast } from '@/hooks/use-toast';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const authService = new AuthService();
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     setLoading(true);
     try {
-      const { data } = await authService.login(credentials);
-      setUser(data.user);
-      localStorage.setItem('access_token', data.access); // Updated to use 'access' instead of 'token'
-      return data.user;
+      const response = await authService.login(credentials);
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const register = useCallback(async (data: RegisterData) => {
     setLoading(true);
     try {
-      const { data: responseData } = await authService.register(data);
-      setUser(responseData.user);
-      localStorage.setItem('access_token', responseData.access); // Updated to use 'access' instead of 'token'
-      return responseData.user;
+      const response = await authService.register(data);
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (error: any) {
+      toast({
+        title: "Registration failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('access_token');
+    authService.logout();
     setUser(null);
   }, []);
-
-  const getProfile = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data } = await authService.getProfile();
-      setUser(data);
-      return data;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const changePassword = useCallback(
-    async (passwordData: { old_password: string; new_password: string }) => {
-      setLoading(true);
-      try {
-        await authService.changePassword(passwordData);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
 
   return {
     user,
@@ -71,7 +56,5 @@ export function useAuth() {
     login,
     register,
     logout,
-    getProfile,
-    changePassword,
   };
 }

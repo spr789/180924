@@ -1,6 +1,6 @@
-'use client';
+"use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -8,41 +8,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 
 const orders = [
   {
-    id: 'ORD001',
-    customer: 'John Doe',
-    product: 'Diamond Solitaire Ring',
-    date: '2024-03-15',
-    amount: '₹89,999',
-    status: 'completed',
+    id: "ORD001",
+    customer: "John Doe",
+    product: "Diamond Solitaire Ring",
+    date: "2024-03-15",
+    amount: "₹89,999",
+    status: "completed",
   },
   {
-    id: 'ORD002',
-    customer: 'Jane Smith',
-    product: 'Pearl Necklace',
-    date: '2024-03-14',
-    amount: '₹45,999',
-    status: 'processing',
+    id: "ORD002",
+    customer: "Jane Smith",
+    product: "Pearl Necklace",
+    date: "2024-03-14",
+    amount: "₹45,999",
+    status: "processing",
   },
   {
-    id: 'ORD003',
-    customer: 'Mike Johnson',
-    product: 'Gold Bangles Set',
-    date: '2024-03-14',
-    amount: '₹125,999',
-    status: 'pending',
+    id: "ORD003",
+    customer: "Mike Johnson",
+    product: "Gold Bangles Set",
+    date: "2024-03-14",
+    amount: "₹125,999",
+    status: "pending",
   },
-];
+]
 
 const statusStyles = {
-  completed: 'bg-green-100 text-green-700',
-  processing: 'bg-blue-100 text-blue-700',
-  pending: 'bg-yellow-100 text-yellow-700',
-};
+  completed: "bg-green-100 text-green-700",
+  processing: "bg-blue-100 text-blue-700",
+  pending: "bg-yellow-100 text-yellow-700",
+}
 
 export function RecentOrders() {
   return (
@@ -72,9 +72,7 @@ export function RecentOrders() {
                 <TableCell>{order.amount}</TableCell>
                 <TableCell>
                   <Badge
-                    className={
-                      statusStyles[order.status as keyof typeof statusStyles]
-                    }
+                    className={statusStyles[order.status as keyof typeof statusStyles]}
                     variant="secondary"
                   >
                     {order.status}
@@ -86,5 +84,5 @@ export function RecentOrders() {
         </Table>
       </CardContent>
     </Card>
-  );
+  )
 }

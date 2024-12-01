@@ -1,119 +1,63 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { OrderService } from '../services/orders';
-import { Order, ApiError } from '../types/types';
+import { Order, CreateOrderData } from '../types/order';
 import { useToast } from '@/hooks/use-toast';
 
+const orderService = new OrderService();
+
 export function useOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
-  const orderService = new OrderService();
+  const queryClient = useQueryClient();
 
-  const fetchOrders = useCallback(
-    async (params?: { page?: number; status?: string; limit?: number }) => {
-      setLoading(true);
-      try {
-        const response = await orderService.getOrders(params);
-        setOrders(response.data);
-        setTotalCount(response.meta.total);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch orders',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast]
-  );
+  const {
+    data: orders,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['orders'],
+    queryFn: () => orderService.getOrders(),
+  });
 
-  const getOrder = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        const response = await orderService.getOrder(id);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch order',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const createOrder = useMutation({
+    mutationFn: (data: CreateOrderData) => orderService.createOrder(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast({
+        title: 'Order placed',
+        description: 'Your order has been placed successfully.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const createOrder = useCallback(
-    async (data: {
-      items: Array<{ product_id: string; quantity: number }>;
-      shipping_address_id: number;
-      payment_method: string;
-    }) => {
-      setLoading(true);
-      try {
-        const response = await orderService.createOrder(data);
-        toast({
-          title: 'Order Created',
-          description: 'Your order has been placed successfully.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to create order',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const cancelOrder = useMutation({
+    mutationFn: (orderId: string) => orderService.cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast({
+        title: 'Order cancelled',
+        description: 'Your order has been cancelled.',
+      });
     },
-    [toast]
-  );
-
-  const cancelOrder = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        const response = await orderService.cancelOrder(id);
-        toast({
-          title: 'Order Cancelled',
-          description: 'Your order has been cancelled successfully.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to cancel order',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
-    [toast]
-  );
+  });
 
   return {
     orders,
-    loading,
-    totalCount,
-    fetchOrders,
-    getOrder,
+    isLoading,
+    error,
     createOrder,
     cancelOrder,
   };

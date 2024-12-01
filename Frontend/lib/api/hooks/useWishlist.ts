@@ -1,118 +1,81 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { WishlistService } from '../services/wishlist';
-import { Product, ApiError } from '../types/types';
 import { useToast } from '@/hooks/use-toast';
 
+const wishlistService = new WishlistService();
+
 export function useWishlist() {
-  const [items, setItems] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
-  const wishlistService = new WishlistService();
+  const queryClient = useQueryClient();
 
-  const fetchWishlist = useCallback(
-    async (params?: { page?: number; limit?: number }) => {
-      setLoading(true);
-      try {
-        const response = await wishlistService.getWishlist(params);
-        setItems(response.data);
-        setTotalCount(response.meta.total);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch wishlist',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast]
-  );
+  const {
+    data: items,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['wishlist'],
+    queryFn: () => wishlistService.getWishlist(),
+  });
 
-  const addToWishlist = useCallback(
-    async (productId: string) => {
-      setLoading(true);
-      try {
-        const response = await wishlistService.addToWishlist(productId);
-        toast({
-          title: 'Added to Wishlist',
-          description: 'Item has been added to your wishlist.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to add item',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const addToWishlist = useMutation({
+    mutationFn: (productId: string) => wishlistService.addToWishlist(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+      toast({
+        title: 'Added to wishlist',
+        description: 'Item has been added to your wishlist.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const removeFromWishlist = useCallback(
-    async (productId: string) => {
-      setLoading(true);
-      try {
-        const response = await wishlistService.removeFromWishlist(productId);
-        toast({
-          title: 'Removed from Wishlist',
-          description: 'Item has been removed from your wishlist.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to remove item',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const removeFromWishlist = useMutation({
+    mutationFn: (productId: string) => wishlistService.removeFromWishlist(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+      toast({
+        title: 'Removed from wishlist',
+        description: 'Item has been removed from your wishlist.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const moveToCart = useCallback(
-    async (productId: string) => {
-      setLoading(true);
-      try {
-        const response = await wishlistService.moveToCart(productId);
-        toast({
-          title: 'Moved to Cart',
-          description: 'Item has been moved to your cart.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to move item',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const moveToCart = useMutation({
+    mutationFn: (productId: string) => wishlistService.moveToCart(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      toast({
+        title: 'Moved to cart',
+        description: 'Item has been moved to your cart.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   return {
     items,
-    loading,
-    totalCount,
-    fetchWishlist,
+    isLoading,
+    error,
     addToWishlist,
     removeFromWishlist,
     moveToCart,

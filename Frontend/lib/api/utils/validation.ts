@@ -1,32 +1,85 @@
-// /lib/api/utils/validation.ts
+import { z } from 'zod';
 
-// Example of validating a required field in a form or API request
-export function validateRequiredFields(fields: Record<string, any>, requiredFields: string[]): boolean {
-  for (const field of requiredFields) {
-    if (!fields[field]) {
-      console.error(`Validation Error: ${field} is required.`);
-      return false; // Return false if any required field is missing
-    }
-  }
-  return true; // Return true if all required fields are present
-}
+/**
+ * Common validation schemas
+ */
+export const validationSchemas = {
+  /**
+   * Login form validation
+   */
+  login: z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+  }),
 
-// Example of validating an email format
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  if (!emailRegex.test(email)) {
-    console.error('Validation Error: Invalid email format.');
-    return false;
-  }
-  return true;
-}
+  /**
+   * Registration form validation
+   */
+  register: z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  }),
 
-// Example of validating a phone number (basic validation)
-export function validatePhoneNumber(phone: string): boolean {
-  const phoneRegex = /^[0-9]{10}$/;
-  if (!phoneRegex.test(phone)) {
-    console.error('Validation Error: Invalid phone number format.');
-    return false;
-  }
-  return true;
-}
+  /**
+   * Product validation
+   */
+  product: z.object({
+    name: z.string().min(1, 'Product name is required'),
+    price: z.number().positive('Price must be positive'),
+    description: z.string().min(10, 'Description must be at least 10 characters'),
+    category: z.string().min(1, 'Category is required'),
+    stock: z.number().int().nonnegative('Stock must be 0 or greater'),
+  }),
+
+  /**
+   * Review validation
+   */
+  review: z.object({
+    rating: z.number().min(1).max(5),
+    title: z.string().min(1, 'Title is required'),
+    comment: z.string().min(10, 'Review must be at least 10 characters'),
+  }),
+};
+
+/**
+ * Validation utilities
+ */
+export const validation = {
+  /**
+   * Validate email format
+   */
+  isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  },
+
+  /**
+   * Validate phone number format
+   */
+  isValidPhone(phone: string): boolean {
+    return /^\+?[\d\s-]{10,}$/.test(phone);
+  },
+
+  /**
+   * Validate password strength
+   */
+  isStrongPassword(password: string): boolean {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return (
+      password.length >= minLength &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumbers &&
+      hasSpecialChar
+    );
+  },
+};

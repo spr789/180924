@@ -4,7 +4,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { Star, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Review } from '@/lib/api/types/review';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface ReviewCardProps {
   review: Review;
@@ -15,7 +19,7 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
 
   return (
-    <div className="space-y-4 rounded-lg border p-6">
+    <div className="border rounded-lg p-6 space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           {review.user.avatar ? (
@@ -27,8 +31,8 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
               className="rounded-full"
             />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <span className="font-medium text-primary">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <span className="text-primary font-medium">
                 {review.user.name[0]}
               </span>
             </div>
@@ -37,8 +41,8 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
             <div className="flex items-center gap-2">
               <span className="font-medium">{review.user.name}</span>
               {review.verified_purchase && (
-                <div className="flex items-center text-sm text-green-600">
-                  <CheckCircle className="mr-1 h-4 w-4" />
+                <div className="flex items-center text-green-600 text-sm">
+                  <CheckCircle className="w-4 h-4 mr-1" />
                   Verified Purchase
                 </div>
               )}
@@ -48,25 +52,21 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${
-                      i < review.rating
-                        ? 'fill-current text-yellow-400'
-                        : 'text-gray-300'
+                    className={`w-4 h-4 ${
+                      i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
                     }`}
                   />
                 ))}
               </div>
               <span>•</span>
-              <time>
-                {formatDistanceToNow(new Date(review.created_at))} ago
-              </time>
+              <time>{formatDistanceToNow(new Date(review.created_at))} ago</time>
             </div>
           </div>
         </div>
       </div>
 
       <div>
-        <h4 className="mb-2 font-medium">{review.title}</h4>
+        <h4 className="font-medium mb-2">{review.title}</h4>
         <p className="text-gray-600">{review.comment}</p>
       </div>
 
@@ -76,7 +76,7 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
             <Dialog key={index}>
               <DialogTrigger asChild>
                 <button
-                  className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg"
+                  className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
                   onClick={() => setSelectedMedia(media.url)}
                 >
                   <Image
@@ -86,7 +86,7 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
                     className="object-cover"
                   />
                   {media.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                       <span className="text-white">▶</span>
                     </div>
                   )}
@@ -94,7 +94,11 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
               </DialogTrigger>
               <DialogContent className="max-w-3xl">
                 {media.type === 'video' ? (
-                  <video src={media.url} controls className="w-full" />
+                  <video
+                    src={media.url}
+                    controls
+                    className="w-full"
+                  />
                 ) : (
                   <Image
                     src={media.url}
@@ -117,7 +121,7 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
           onClick={() => onVote('helpful')}
           className={review.user_vote === 'helpful' ? 'text-green-600' : ''}
         >
-          <ThumbsUp className="mr-2 h-4 w-4" />
+          <ThumbsUp className="w-4 h-4 mr-2" />
           Helpful ({review.helpful_count})
         </Button>
         <Button
@@ -126,10 +130,8 @@ export function ReviewCard({ review, onVote }: ReviewCardProps) {
           onClick={() => onVote('not_helpful')}
           className={review.user_vote === 'not_helpful' ? 'text-red-600' : ''}
         >
-          <ThumbsDown className="mr-2 h-4 w-4" />
-          Not Helpful ({
-            review.not_helpful_count
-          })
+          <ThumbsDown className="w-4 h-4 mr-2" />
+          Not Helpful ({review.not_helpful_count})
         </Button>
       </div>
     </div>

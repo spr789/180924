@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,34 +18,16 @@ import {
 } from '@/components/ui/form';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'video/mp4',
-];
+const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
 
 const reviewSchema = z.object({
   rating: z.number().min(1).max(5),
-  title: z.string().min(1, 'Title is required').max(100),
-  comment: z
-    .string()
-    .min(10, 'Comment must be at least 10 characters')
-    .max(1000),
-  media: z
-    .array(
-      z
-        .instanceof(File)
-        .refine(
-          (file) => file.size <= MAX_FILE_SIZE,
-          'File size must be less than 5MB'
-        )
-        .refine(
-          (file) => ACCEPTED_FILE_TYPES.includes(file.type),
-          'Invalid file type'
-        )
-    )
-    .optional(),
+  title: z.string().min(1, "Title is required").max(100),
+  comment: z.string().min(10, "Comment must be at least 10 characters").max(1000),
+  media: z.array(z.instanceof(File)
+    .refine(file => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
+    .refine(file => ACCEPTED_FILE_TYPES.includes(file.type), 'Invalid file type')
+  ).optional(),
 });
 
 type ReviewFormData = z.infer<typeof reviewSchema>;
@@ -72,17 +54,16 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(
-      (file) =>
-        file.size <= MAX_FILE_SIZE && ACCEPTED_FILE_TYPES.includes(file.type)
+    const validFiles = files.filter(file => 
+      file.size <= MAX_FILE_SIZE && ACCEPTED_FILE_TYPES.includes(file.type)
     );
 
-    setSelectedFiles((prev) => [...prev, ...validFiles]);
-
-    validFiles.forEach((file) => {
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+    
+    validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviews((prev) => [...prev, reader.result as string]);
+        setPreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
@@ -91,12 +72,9 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
   };
 
   const removeFile = (index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
-    form.setValue(
-      'media',
-      selectedFiles.filter((_, i) => i !== index)
-    );
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+    form.setValue('media', selectedFiles.filter((_, i) => i !== index));
   };
 
   return (
@@ -119,9 +97,9 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
                     onClick={() => field.onChange(rating)}
                   >
                     <Star
-                      className={`h-6 w-6 ${
+                      className={`w-6 h-6 ${
                         rating <= (hoveredRating || field.value)
-                          ? 'fill-current text-yellow-400'
+                          ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       }`}
                     />
@@ -169,30 +147,30 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
           <FormLabel>Photos/Videos (optional)</FormLabel>
           <div className="flex flex-wrap gap-4">
             {previews.map((preview, index) => (
-              <div key={index} className="relative h-24 w-24">
+              <div key={index} className="relative w-24 h-24">
                 {selectedFiles[index]?.type.startsWith('video/') ? (
                   <video
                     src={preview}
-                    className="h-full w-full rounded-lg object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
                   <img
                     src={preview}
                     alt={`Preview ${index + 1}`}
-                    className="h-full w-full rounded-lg object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 )}
                 <button
                   type="button"
                   onClick={() => removeFile(index)}
-                  className="absolute -right-2 -top-2 rounded-full bg-white p-1 shadow"
+                  className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             ))}
             {previews.length < 5 && (
-              <label className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed hover:border-primary">
+              <label className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-primary">
                 <input
                   type="file"
                   accept={ACCEPTED_FILE_TYPES.join(',')}
@@ -200,7 +178,7 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
                   className="hidden"
                   multiple
                 />
-                <Upload className="h-6 w-6 text-gray-400" />
+                <Upload className="w-6 h-6 text-gray-400" />
               </label>
             )}
           </div>

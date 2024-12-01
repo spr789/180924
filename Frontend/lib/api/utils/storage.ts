@@ -1,21 +1,21 @@
-const PREFIX = 'lumiere:';
+const PREFIX = 'app:';
 
 export const storage = {
+  get<T>(key: string): T | null {
+    try {
+      const item = localStorage.getItem(`${PREFIX}${key}`);
+      return item ? JSON.parse(item) : null;
+    } catch (error) {
+      console.error('Storage get error:', error);
+      return null;
+    }
+  },
+
   set(key: string, value: any): void {
     try {
       localStorage.setItem(`${PREFIX}${key}`, JSON.stringify(value));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
-  },
-
-  get<T>(key: string, defaultValue: T | null = null): T | null {
-    try {
-      const item = localStorage.getItem(`${PREFIX}${key}`);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch (error) {
-      console.error('Error reading from localStorage:', error);
-      return defaultValue;
+      console.error('Storage set error:', error);
     }
   },
 
@@ -24,8 +24,6 @@ export const storage = {
   },
 
   clear(): void {
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(PREFIX))
-      .forEach((key) => localStorage.removeItem(key));
-  },
+    localStorage.clear();
+  }
 };

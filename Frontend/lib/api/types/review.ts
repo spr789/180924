@@ -1,24 +1,27 @@
 export interface Review {
   id: string;
+  product_id: string;
   user: {
-    id: number;
+    id: string;
     name: string;
     avatar?: string;
   };
   rating: number;
   title: string;
   comment: string;
-  media: {
-    type: 'image' | 'video';
-    url: string;
-    thumbnail?: string;
-  }[];
+  media: ReviewMedia[];
   helpful_count: number;
   not_helpful_count: number;
   user_vote?: 'helpful' | 'not_helpful';
   verified_purchase: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface ReviewMedia {
+  type: 'image' | 'video';
+  url: string;
+  thumbnail?: string;
 }
 
 export interface ReviewCreateData {

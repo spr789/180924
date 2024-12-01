@@ -1,13 +1,13 @@
-import { Breadcrumb } from '@/components/breadcrumb';
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export function ProductsHeader() {
   const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Products', href: '/products' },
-  ];
+    { label: "Home", href: "/" },
+    { label: "Products", href: "/products" },
+  ]
 
   return (
-    <div className="border-b bg-white">
+    <div className="bg-white border-b">
       <div className="container py-8">
         <Breadcrumb items={breadcrumbItems} />
         <div className="mt-4">
@@ -18,5 +18,5 @@ export function ProductsHeader() {
         </div>
       </div>
     </div>
-  );
+  )
 }

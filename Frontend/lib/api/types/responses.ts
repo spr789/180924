@@ -1,4 +1,6 @@
-// Base response type for all API responses
+/**
+ * Base API response interface
+ */
 export interface ApiResponse<T> {
   data: T;
   status: number;
@@ -7,7 +9,9 @@ export interface ApiResponse<T> {
   requestId?: string;
 }
 
-// Error response structure
+/**
+ * API error response interface
+ */
 export interface ApiError {
   code: string;
   message: string;
@@ -17,7 +21,9 @@ export interface ApiError {
   requestId?: string;
 }
 
-// Pagination metadata
+/**
+ * Pagination metadata interface
+ */
 export interface PaginationMeta {
   currentPage: number;
   totalPages: number;
@@ -27,7 +33,9 @@ export interface PaginationMeta {
   hasPreviousPage: boolean;
 }
 
-// Paginated response wrapper
+/**
+ * Paginated response wrapper interface
+ */
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   meta: PaginationMeta;
 }

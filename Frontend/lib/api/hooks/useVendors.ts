@@ -1,148 +1,63 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { VendorService } from '../services/vendors';
-import { Vendor, Product, ApiError } from '../types/types';
+import { Vendor } from '../types/vendor';
 import { useToast } from '@/hooks/use-toast';
 
+const vendorService = new VendorService();
+
 export function useVendors() {
-  const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
-  const vendorService = new VendorService();
+  const queryClient = useQueryClient();
 
-  const fetchVendors = useCallback(
-    async (params?: {
-      page?: number;
-      limit?: number;
-      category?: string;
-      rating?: number;
-      search?: string;
-    }) => {
-      setLoading(true);
-      try {
-        const response = await vendorService.getVendors(params);
-        setVendors(response.data);
-        setTotalCount(response.meta.total);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch vendors',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast]
-  );
+  const {
+    data: vendors,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: () => vendorService.getVendors(),
+  });
 
-  const getVendor = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        const response = await vendorService.getVendor(id);
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch vendor',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const followVendor = useMutation({
+    mutationFn: (vendorId: string) => vendorService.followVendor(vendorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendors'] });
+      toast({
+        title: 'Following vendor',
+        description: 'You are now following this vendor.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const getVendorProducts = useCallback(
-    async (
-      vendorId: string,
-      params?: {
-        page?: number;
-        limit?: number;
-        category?: string;
-        sort?: string;
-      }
-    ) => {
-      setLoading(true);
-      try {
-        const response = await vendorService.getVendorProducts(
-          vendorId,
-          params
-        );
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch vendor products',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const unfollowVendor = useMutation({
+    mutationFn: (vendorId: string) => vendorService.unfollowVendor(vendorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendors'] });
+      toast({
+        title: 'Unfollowed vendor',
+        description: 'You are no longer following this vendor.',
+      });
     },
-    [toast]
-  );
-
-  const followVendor = useCallback(
-    async (vendorId: string) => {
-      try {
-        const response = await vendorService.followVendor(vendorId);
-        toast({
-          title: 'Following Vendor',
-          description: 'You are now following this vendor.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to follow vendor',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
-    [toast]
-  );
-
-  const unfollowVendor = useCallback(
-    async (vendorId: string) => {
-      try {
-        const response = await vendorService.unfollowVendor(vendorId);
-        toast({
-          title: 'Unfollowed Vendor',
-          description: 'You are no longer following this vendor.',
-        });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to unfollow vendor',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
-    },
-    [toast]
-  );
+  });
 
   return {
     vendors,
-    loading,
-    totalCount,
-    fetchVendors,
-    getVendor,
-    getVendorProducts,
+    isLoading,
+    error,
     followVendor,
     unfollowVendor,
   };

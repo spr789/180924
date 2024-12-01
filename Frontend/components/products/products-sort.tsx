@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import {
   Select,
@@ -6,11 +6,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select"
 
 interface ProductsSortProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: string
+  onValueChange: (value: string) => void
 }
 
 export function ProductsSort({ value, onValueChange }: ProductsSortProps) {
@@ -26,5 +26,5 @@ export function ProductsSort({ value, onValueChange }: ProductsSortProps) {
         <SelectItem value="newest">Newest First</SelectItem>
       </SelectContent>
     </Select>
-  );
+  )
 }

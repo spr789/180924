@@ -1,6 +1,6 @@
-'use client';
+"use client"
 
-import Link from 'next/link';
+import Link from "next/link"
 
 export function MegaMenu() {
   return (
@@ -21,5 +21,5 @@ export function MegaMenu() {
         92.5 Silver
       </Link>
     </nav>
-  );
+  )
 }

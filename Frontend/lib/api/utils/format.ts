@@ -1,29 +1,67 @@
-// /lib/api/utils/format.ts
+/**
+ * Data formatting utilities
+ */
+export const format = {
+  /**
+   * Format currency amount
+   */
+  currency(amount: number, currency = 'INR'): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+    }).format(amount);
+  },
 
-// Format a number as currency (e.g., $1,234.56)
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-}
+  /**
+   * Format date string
+   */
+  date(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    };
 
-// Format a date into a readable format (e.g., MM/DD/YYYY)
-export function formatDate(date: string | Date, format: string = 'MM/DD/YYYY'): string {
-  const options: Intl.DateTimeFormatOptions = {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-  };
-  return new Date(date).toLocaleDateString('en-US', options);
-}
+    return new Intl.DateTimeFormat('en-IN', options || defaultOptions)
+      .format(new Date(date));
+  },
 
-// Example of formatting an API response for product price
-export function formatProductPrice(price: number): string {
-  return price.toFixed(2); // Ensure price is formatted to two decimal places
-}
+  /**
+   * Format phone number
+   */
+  phoneNumber(phone: string): string {
+    const cleaned = phone.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    return phone;
+  },
 
-// Convert an object to a query string (e.g., ?key=value&key2=value2)
-export function formatQueryParams(params: Record<string, any>): string {
-  return new URLSearchParams(params).toString();
-}
+  /**
+   * Create URL-friendly slug
+   */
+  slug(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
+  },
+
+  /**
+   * Format file size
+   */
+  fileSize(bytes: number): string {
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+  }
+};

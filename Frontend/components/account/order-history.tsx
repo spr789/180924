@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -12,33 +12,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 const orderHistory = [
   {
-    id: '8923',
-    date: '15 December 2022',
-    status: 'Delivered',
-    total: '₹899',
-    items: 2,
+    id: "8923",
+    date: "15 December 2022",
+    status: "Delivered",
+    total: "₹899",
+    items: 2
   },
   {
-    id: '8922',
-    date: '10 December 2022',
-    status: 'Delivered',
-    total: '₹1,299',
-    items: 1,
+    id: "8922",
+    date: "10 December 2022",
+    status: "Delivered",
+    total: "₹1,299",
+    items: 1
   },
   {
-    id: '8921',
-    date: '5 December 2022',
-    status: 'Delivered',
-    total: '₹599',
-    items: 3,
-  },
-];
+    id: "8921",
+    date: "5 December 2022",
+    status: "Delivered",
+    total: "₹599",
+    items: 3
+  }
+]
 
 export function OrderHistory() {
   return (
@@ -69,10 +69,8 @@ export function OrderHistory() {
                 <TableCell>{order.items} items</TableCell>
                 <TableCell>{order.total}</TableCell>
                 <TableCell>
-                  <Badge
-                    variant={
-                      order.status === 'Delivered' ? 'success' : 'secondary'
-                    }
+                  <Badge 
+                    variant={order.status === "Delivered" ? "success" : "secondary"}
                   >
                     {order.status}
                   </Badge>
@@ -88,5 +86,5 @@ export function OrderHistory() {
         </Table>
       </CardContent>
     </Card>
-  );
+  )
 }

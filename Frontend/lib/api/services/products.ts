@@ -1,6 +1,7 @@
-import { ApiClient } from '../utils/client';
-import { API_ENDPOINTS } from '../../config/config';
-import { ApiResponse, PaginatedResponse, Product } from '../types/types';
+import { ApiClient } from '../client';
+import { API_ENDPOINTS } from '../config';
+import { Product, ProductFilters } from '../types/product';
+import { ApiResponse, PaginatedResponse } from '../types/responses';
 
 export class ProductService {
   private client: ApiClient;
@@ -9,29 +10,23 @@ export class ProductService {
     this.client = ApiClient.getInstance();
   }
 
-  async getProducts(params?: {
-    page?: number;
-    category?: string;
-    search?: string;
-    min_price?: number;
-    max_price?: number;
-    sort_by?: string;
-  }): Promise<ApiResponse<PaginatedResponse<Product>>> {
-    return this.client.get<ApiResponse<PaginatedResponse<Product>>>(
-      API_ENDPOINTS.PRODUCTS,
-      params as Record<string, string>
-    );
+  async getProducts(filters?: ProductFilters): Promise<ApiResponse<PaginatedResponse<Product>>> {
+    return this.client.get<PaginatedResponse<Product>>(API_ENDPOINTS.PRODUCTS.LIST, filters);
   }
 
   async getProduct(id: string): Promise<ApiResponse<Product>> {
-    return this.client.get<ApiResponse<Product>>(
-      API_ENDPOINTS.PRODUCT_DETAIL(id)
-    );
+    return this.client.get<Product>(API_ENDPOINTS.PRODUCTS.DETAIL(id));
   }
 
-  async getCategories(): Promise<ApiResponse<string[]>> {
-    return this.client.get<ApiResponse<string[]>>(
-      API_ENDPOINTS.PRODUCT_CATEGORIES
-    );
+  async createProduct(data: Partial<Product>): Promise<ApiResponse<Product>> {
+    return this.client.post<Product>(API_ENDPOINTS.PRODUCTS.LIST, data);
+  }
+
+  async updateProduct(id: string, data: Partial<Product>): Promise<ApiResponse<Product>> {
+    return this.client.put<Product>(API_ENDPOINTS.PRODUCTS.DETAIL(id), data);
+  }
+
+  async deleteProduct(id: string): Promise<ApiResponse<void>> {
+    return this.client.delete<void>(API_ENDPOINTS.PRODUCTS.DETAIL(id));
   }
 }

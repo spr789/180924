@@ -1,71 +1,84 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductService } from '../services/products';
-import { Product, ApiError } from '../types/types';
+import { Product, ProductFilters } from '../types/product';
 import { useToast } from '@/hooks/use-toast';
 
-export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
+const productService = new ProductService();
+
+export function useProducts(filters?: ProductFilters) {
   const { toast } = useToast();
-  const productService = new ProductService();
+  const queryClient = useQueryClient();
 
-  const fetchProducts = useCallback(
-    async (params?: {
-      page?: number;
-      category?: string;
-      search?: string;
-      min_price?: number;
-      max_price?: number;
-      sort_by?: string;
-    }) => {
-      setLoading(true);
-      try {
-        const response = await productService.getProducts(params);
-        setProducts(response.data.results);
-        setTotalCount(response.data.count);
-        return response.data;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch products',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast]
-  );
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['products', filters],
+    queryFn: () => productService.getProducts(filters),
+  });
 
-  const fetchProduct = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        const response = await productService.getProduct(id);
-        return response.data;
-      } catch (error) {
-        const apiError = error as ApiError;
-        toast({
-          title: 'Failed to fetch product',
-          description: apiError.message,
-          variant: 'destructive',
-        });
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+  const createProduct = useMutation({
+    mutationFn: (data: Partial<Product>) => productService.createProduct(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: 'Product created',
+        description: 'Product has been created successfully.',
+      });
     },
-    [toast]
-  );
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const updateProduct = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
+      productService.updateProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: 'Product updated',
+        description: 'Product has been updated successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deleteProduct = useMutation({
+    mutationFn: (id: string) => productService.deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: 'Product deleted',
+        description: 'Product has been deleted successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   return {
     products,
-    totalCount,
-    loading,
-    fetchProducts,
-    fetchProduct,
+    isLoading,
+    error,
+    createProduct,
+    updateProduct,
+    deleteProduct,
   };
 }

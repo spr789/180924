@@ -1,10 +1,10 @@
-'use client';
+"use client"
 
-import { DashboardOverview } from '@/components/dashboard/dashboard-overview';
-import { RecentOrders } from '@/components/dashboard/recent-orders';
-import { TopProducts } from '@/components/dashboard/top-products';
-import { RevenueChart } from '@/components/dashboard/revenue-chart';
-import { QuickActions } from '@/components/dashboard/quick-actions';
+import { DashboardOverview } from "@/components/dashboard/dashboard-overview"
+import { RecentOrders } from "@/components/dashboard/recent-orders"
+import { TopProducts } from "@/components/dashboard/top-products"
+import { RevenueChart } from "@/components/dashboard/revenue-chart"
+import { QuickActions } from "@/components/dashboard/quick-actions"
 
 export default function VendorDashboardPage() {
   return (
@@ -16,12 +16,12 @@ export default function VendorDashboardPage() {
 
       <DashboardOverview />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RevenueChart />
         <TopProducts />
       </div>
 
       <RecentOrders />
     </div>
-  );
+  )
 }

@@ -1,38 +1,37 @@
-import { Store, Users, TrendingUp, Shield } from 'lucide-react';
+import { Store, Users, TrendingUp, Shield } from "lucide-react"
 
 const benefits = [
   {
-    icon: <Store className="h-6 w-6" />,
-    title: 'Digital Storefront',
-    description:
-      'Get your own customizable store page to showcase your products',
+    icon: <Store className="w-6 h-6" />,
+    title: "Digital Storefront",
+    description: "Get your own customizable store page to showcase your products",
   },
   {
-    icon: <Users className="h-6 w-6" />,
-    title: 'Wide Reach',
-    description: 'Access to millions of customers across India',
+    icon: <Users className="w-6 h-6" />,
+    title: "Wide Reach",
+    description: "Access to millions of customers across India",
   },
   {
-    icon: <TrendingUp className="h-6 w-6" />,
-    title: 'Growth Tools',
-    description: 'Analytics and marketing tools to grow your business',
+    icon: <TrendingUp className="w-6 h-6" />,
+    title: "Growth Tools",
+    description: "Analytics and marketing tools to grow your business",
   },
   {
-    icon: <Shield className="h-6 w-6" />,
-    title: 'Secure Payments',
-    description: 'Reliable payment processing and fraud protection',
+    icon: <Shield className="w-6 h-6" />,
+    title: "Secure Payments",
+    description: "Reliable payment processing and fraud protection",
   },
-];
+]
 
 export function VendorBenefits() {
   return (
     <div className="space-y-8">
-      <div className="rounded-lg bg-red-50 p-6">
-        <h2 className="mb-4 text-xl font-semibold">Why Join Us?</h2>
+      <div className="bg-red-50 p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Why Join Us?</h2>
         <div className="space-y-6">
           {benefits.map((benefit) => (
             <div key={benefit.title} className="flex gap-4">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600">
                 {benefit.icon}
               </div>
               <div>
@@ -44,9 +43,9 @@ export function VendorBenefits() {
         </div>
       </div>
 
-      <div className="rounded-lg bg-gray-50 p-6">
-        <h2 className="mb-4 text-xl font-semibold">Requirements</h2>
-        <ul className="list-inside list-disc space-y-2 text-sm text-gray-600">
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Requirements</h2>
+        <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
           <li>Valid business registration</li>
           <li>Quality product photographs</li>
           <li>Minimum inventory capacity</li>
@@ -54,5 +53,5 @@ export function VendorBenefits() {
         </ul>
       </div>
     </div>
-  );
+  )
 }

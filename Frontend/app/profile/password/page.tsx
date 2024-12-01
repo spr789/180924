@@ -1,60 +1,59 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/auth-context';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ChangePasswordPage() {
-  const { changePassword } = useAuth();
-  const { toast } = useToast();
+  const { changePassword } = useAuth()
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
-    old_password: '',
-    new_password1: '',
-    new_password2: '',
-  });
+    old_password: "",
+    new_password1: "",
+    new_password2: "",
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await changePassword(formData);
+      await changePassword(formData)
       toast({
-        title: 'Password Updated',
-        description: 'Your password has been successfully changed.',
-      });
+        title: "Password Updated",
+        description: "Your password has been successfully changed.",
+      })
       setFormData({
-        old_password: '',
-        new_password1: '',
-        new_password2: '',
-      });
+        old_password: "",
+        new_password1: "",
+        new_password2: "",
+      })
     } catch (error) {
       toast({
-        title: 'Update Failed',
-        description:
-          'Failed to change password. Please check your current password and try again.',
-        variant: 'destructive',
-      });
+        title: "Update Failed",
+        description: "Failed to change password. Please check your current password and try again.",
+        variant: "destructive",
+      })
     }
-  };
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   return (
     <>
       <Navbar />
       <main className="min-h-screen py-16">
         <div className="container max-w-md">
-          <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h1 className="mb-6 text-2xl font-bold">Change Password</h1>
+          <div className="bg-white p-8 rounded-lg shadow-sm">
+            <h1 className="text-2xl font-bold mb-6">Change Password</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
@@ -104,5 +103,5 @@ export default function ChangePasswordPage() {
       </main>
       <Footer />
     </>
-  );
+  )
 }

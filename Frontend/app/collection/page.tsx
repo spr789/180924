@@ -1,7 +1,7 @@
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
-import { CollectionGrid } from '@/components/collection-grid';
-import { CollectionFilters } from '@/components/collection-filters';
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
+import { CollectionGrid } from "@/components/collection-grid"
+import { CollectionFilters } from "@/components/collection-filters"
 
 export default function CollectionPage() {
   return (
@@ -9,14 +9,14 @@ export default function CollectionPage() {
       <Navbar />
       <main className="min-h-screen py-16">
         <div className="container">
-          <div className="mb-12 text-center">
-            <h1 className="mb-4 text-4xl font-bold">Our Collections</h1>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Our Collections</h1>
             <p className="text-lg text-gray-600">
               Discover our curated collections of timeless jewelry pieces
             </p>
           </div>
-
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <CollectionFilters />
             <div className="lg:col-span-3">
               <CollectionGrid />
@@ -26,5 +26,5 @@ export default function CollectionPage() {
       </main>
       <Footer />
     </>
-  );
+  )
 }

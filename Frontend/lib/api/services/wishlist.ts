@@ -1,70 +1,28 @@
-import axiosInstance from '../utils/axios';
-import { Product, PaginatedResponse } from '../types/types';
+import { ApiClient } from '../client';
+import { API_ENDPOINTS } from '../config';
+import { Product } from '../types/product';
+import { ApiResponse, PaginatedResponse } from '../types/responses';
 
 export class WishlistService {
-  async getWishlist(params?: { page?: number; limit?: number }) {
-    try {
-      const response = await axiosInstance.get<PaginatedResponse<Product>>(
-        '/wishlist',
-        { params }
-      );
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
+  private client: ApiClient;
+
+  constructor() {
+    this.client = ApiClient.getInstance();
   }
 
-  async addToWishlist(productId: string) {
-    try {
-      const response = await axiosInstance.post('/wishlist/add', {
-        product_id: productId,
-      });
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
+  async getWishlist(): Promise<ApiResponse<PaginatedResponse<Product>>> {
+    return this.client.get<PaginatedResponse<Product>>(API_ENDPOINTS.WISHLIST.LIST);
   }
 
-  async removeFromWishlist(productId: string) {
-    try {
-      const response = await axiosInstance.delete(`/wishlist/${productId}`);
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
+  async addToWishlist(productId: string): Promise<ApiResponse<void>> {
+    return this.client.post<void>(API_ENDPOINTS.WISHLIST.ADD, { product_id: productId });
   }
 
-  async clearWishlist() {
-    try {
-      const response = await axiosInstance.delete('/wishlist');
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
+  async removeFromWishlist(productId: string): Promise<ApiResponse<void>> {
+    return this.client.delete<void>(API_ENDPOINTS.WISHLIST.REMOVE(productId));
   }
 
-  async moveToCart(productId: string) {
-    try {
-      const response = await axiosInstance.post('/wishlist/move-to-cart', {
-        product_id: productId,
-      });
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
-  }
-
-  private handleError(error: any) {
-    if (error.response) {
-      throw {
-        message: error.response.data.message || 'An error occurred',
-        status: error.response.status,
-        errors: error.response.data.errors,
-      };
-    }
-    throw {
-      message: 'Network error occurred',
-      status: 500,
-    };
+  async moveToCart(productId: string): Promise<ApiResponse<void>> {
+    return this.client.post<void>(API_ENDPOINTS.WISHLIST.MOVE_TO_CART, { product_id: productId });
   }
 }

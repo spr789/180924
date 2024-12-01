@@ -5,35 +5,35 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 const orders = [
   {
-    id: '#6543wedc6',
-    product: 'Aavic Headphone',
-    customer: 'John Doe',
-    date: '2024-01-15',
-    amount: '₹152.25',
-    status: 'success',
+    id: "#6543wedc6",
+    product: "Aavic Headphone",
+    customer: "John Doe",
+    date: "2024-01-15",
+    amount: "₹152.25",
+    status: "success",
   },
   {
-    id: '#6543wedc5',
-    product: 'Nike Shoes',
-    customer: 'Jane Smith',
-    date: '2024-01-15',
-    amount: '₹125.25',
-    status: 'pending',
+    id: "#6543wedc5",
+    product: "Nike Shoes",
+    customer: "Jane Smith",
+    date: "2024-01-15",
+    amount: "₹125.25",
+    status: "pending",
   },
   // Add more orders as needed
-];
+]
 
 export function VendorOrders() {
   return (
@@ -66,9 +66,7 @@ export function VendorOrders() {
                 <TableCell>{order.amount}</TableCell>
                 <TableCell>
                   <Badge
-                    variant={
-                      order.status === 'success' ? 'default' : 'secondary'
-                    }
+                    variant={order.status === "success" ? "default" : "secondary"}
                   >
                     {order.status}
                   </Badge>
@@ -79,5 +77,5 @@ export function VendorOrders() {
         </Table>
       </CardContent>
     </Card>
-  );
+  )
 }
