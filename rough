@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "version:1 api config client modified"
+git commit -m "version:1 products config yet.., re lo succ"
 git push origin main
 
 

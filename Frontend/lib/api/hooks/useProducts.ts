@@ -27,7 +27,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been created successfully.',
       });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: 'Error',
         description: error.message,
@@ -46,7 +46,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been updated successfully.',
       });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: 'Error',
         description: error.message,
@@ -64,7 +64,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been deleted successfully.',
       });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: 'Error',
         description: error.message,

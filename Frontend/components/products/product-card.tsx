@@ -7,20 +7,25 @@ import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useWishlist, WishlistItem } from "@/hooks/use-wishlist"
+import { Product } from "@/lib/api/types/product"
 
 interface ProductCardProps {
   id: string
   name: string
-  material: string
-  price: number
+  description: string
+  brand: string
+  original_price: number // Changed to number to match the model
+  discounted_price?: number // Changed to number and made optional
   image: string
 }
 
 export function ProductCard({
   id,
   name,
-  material,
-  price,
+  description,
+  brand,
+  original_price,
+  discounted_price,
   image
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
@@ -34,9 +39,9 @@ export function ProductCard({
     const item: WishlistItem = {
       id,
       name,
-      price,
+      price: discounted_price ? discounted_price : original_price, // Use discounted price if available
       image,
-      material,
+      material: brand, // Assuming brand is used as material
     }
 
     if (isInWishlist(id)) {
@@ -92,8 +97,8 @@ export function ProductCard({
         <Link href={`/product/${id}`}>
           <h3 className="text-sm font-medium">{name}</h3>
         </Link>
-        <p className="text-sm text-gray-600">{material}</p>
-        <p className="text-sm font-medium">₹{price.toLocaleString()}</p>
+        <p className="text-sm text-gray-600">{description}</p>
+        <p className="text-sm font-medium">₹{(discounted_price ? discounted_price : original_price).toLocaleString()}</p>
       </div>
     </div>
   )

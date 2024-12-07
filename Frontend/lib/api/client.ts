@@ -83,7 +83,12 @@ export class ApiClient {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');
       if (token) {
-        this.token = JSON.parse(token);
+        try {
+          this.token = JSON.parse(token);
+        } catch (error) {
+          console.error("Failed to parse auth_token from localStorage:", error);
+          this.clearToken(); // Clear token if parsing fails
+        }
       }
     }
   }

@@ -12,9 +12,9 @@ class ProductImageSerializer(serializers.ModelSerializer):
 # Serializer for Product
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    collections = serializers.PrimaryKeyRelatedField(many=True, queryset=Collection.objects.all())
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False)
+    collections = serializers.PrimaryKeyRelatedField(many=True, queryset=Collection.objects.all(), required=False)
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False)
     
     class Meta:
         model = Product

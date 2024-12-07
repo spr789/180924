@@ -25,17 +25,18 @@ export interface ApiError {
  * Pagination metadata interface
  */
 export interface PaginationMeta {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
-  totalCount: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  current_page: number; // Changed to snake_case to match the convention
+  total_pages: number; // Changed to snake_case to match the convention
+  page_size: number; // Changed to snake_case to match the convention
+  total_count: number; // Changed to snake_case to match the convention
+  has_next_page: boolean; // Changed to snake_case to match the convention
+  has_previous_page: boolean; // Changed to snake_case to match the convention
 }
 
 /**
  * Paginated response wrapper interface
  */
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+export interface PaginatedResponse<T> extends ApiResponse<T> {
+  items: T[];
   meta: PaginationMeta;
 }

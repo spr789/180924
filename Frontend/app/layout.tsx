@@ -10,6 +10,7 @@ import { BottomNav } from '@/components/mobile-nav/bottom-nav'
 import { Toaster } from '@/components/ui/toaster'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import QueryProvider from '@/providers/query-provider'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -88,11 +89,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <SearchProvider>
               <CartProvider>
                 <WishlistProvider>
-                  <TopBanner />
-                  {children}
-                  <BottomNav />
-                  <Toaster />
-                  <Analytics />
+                  <QueryProvider>
+                    <TopBanner />
+                    {children}
+                    <BottomNav />
+                    <Toaster />
+                    <Analytics />
+                  </QueryProvider>
                 </WishlistProvider>
               </CartProvider>
             </SearchProvider>

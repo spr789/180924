@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from django.db import IntegrityError
 from .models import Product, ProductImage, ProductReview, BulkUpload
 from .serializers import ProductSerializer, ProductImageSerializer, ProductReviewSerializer, BulkUploadSerializer
+from rest_framework.permissions import AllowAny
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
@@ -20,6 +21,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description', 'brand', 'sku']
     ordering_fields = ['name', 'created_at', 'original_price', 'stock']
     ordering = ['name']
+    permission_classes = [AllowAny]  # Allow public access to products
+
 
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True, status='approved')

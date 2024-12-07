@@ -1,51 +1,73 @@
 export interface Product {
   id: string;
+  vendor: number; // Changed to match the model
   name: string;
+  slug: string; // Added slug to match the model
   description: string;
-  price: number;
-  sale_price?: number;
+  brand: string; // Added brand to match the model
+  original_price: number; // Kept as original_price to match the model
+  discounted_price?: number; // Kept as discounted_price to match the model
+  discount_start_date?: string | null; // Added to match the model
+  discount_end_date?: string | null; // Added to match the model
+  category: number; // Changed to number to match the model
+  collections?: number[]; // Added collections to match the model
+  tags?: string[]; // Added tags to match the model
   stock: number;
-  category: string;
-  images: string[];
-  vendor: Vendor; // Updated to use Vendor interface
-  rating: number;
-  reviews_count: number;
+  sku: string; // Added sku to match the model
+  upc?: string | null; // Added upc to match the model
+  weight: string; // Added weight to match the model
+  dimensions: string; // Added dimensions to match the model
+  condition: string; // Added condition to match the model
+  shipping_cost: number; // Changed to number to match the model
+  free_shipping: boolean; // Added free_shipping to match the model
+  is_digital: boolean; // Added is_digital to match the model
+  backorder: boolean; // Added backorder to match the model
+  low_stock_threshold: number; // Added low_stock_threshold to match the model
+  warranty_period: string; // Added warranty_period to match the model
+  returnable: boolean; // Added returnable to match the model
+  is_active: boolean; // Added is_active to match the model
+  status: string; // Added status to match the model
+  average_rating: number; // Kept as average_rating to match the model
+  rating_count: number; // Kept as rating_count to match the model
+  available_from?: string | null; // Added available_from to match the model
+  available_until?: string | null; // Added available_until to match the model
   created_at: string;
   updated_at: string;
+  images: string[];
 }
 
 export interface Vendor {
   id: string;
   name: string;
-  description: string; // Added description to match the model
-  logo: string; // Added logo to match the model
-  cover_image: string; // Added cover_image to match the model
-  rating: number;
-  reviews_count: number;
-  products_count: number; // Added products_count to match the model
-  followers_count: number; // Added followers_count to match the model
-  contact_email: string; // Added contact_email to match the model
-  contact_phone: string; // Added contact_phone to match the model
+  description: string; // Kept description to match the model
+  logo: string; // Kept logo to match the model
+  cover_image: string; // Kept cover_image to match the model
+  average_rating: number; // Kept as average_rating to match the model
+  rating_count: number; // Kept as rating_count to match the model
+  products_count: number; // Kept products_count to match the model
+  followers_count: number; // Kept followers_count to match the model
+  contact_email: string; // Kept contact_email to match the model
+  contact_phone: string; // Kept contact_phone to match the model
   social_media?: {
     facebook?: string;
     instagram?: string;
     twitter?: string;
   };
-  badges: string[]; // Added badges to match the model
+  badges: string[]; // Kept badges to match the model
   metrics: {
-    response_rate: number; // Added metrics to match the model
-    ship_on_time: number; // Added metrics to match the model
-    order_completion: number; // Added metrics to match the model
+    response_rate: number; // Kept response_rate to match the model
+    ship_on_time: number; // Kept ship_on_time to match the model
+    order_completion: number; // Kept order_completion to match the model
   };
   created_at: string;
 }
 
 export interface ProductFilters {
-  category?: string;
+  category?: number; // Changed to number to match the model
   min_price?: number;
   max_price?: number;
-  rating?: number;
-  sort_by?: 'price_asc' | 'price_desc' | 'newest' | 'rating';
+  average_rating?: number; // Kept as average_rating to match the model
+  sort_by?: 'price_asc' | 'price_desc' | 'newest' | 'average_rating'; // Kept as is
   page?: number;
   limit?: number;
 }

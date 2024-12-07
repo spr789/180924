@@ -25,7 +25,8 @@ export class ResponseHandler {
     status = HTTP_STATUS.OK
   ): PaginatedResponse<T> {
     return {
-      data,
+      data: data as T,
+      items: data,
       meta,
       status,
       timestamp: new Date().toISOString(),

@@ -8,16 +8,20 @@ import { Button } from "@/components/ui/button"
 interface ProductCardProps {
   id: string
   name: string
-  material: string
-  price: number
+  description: string
+  brand: string
+  original_price: string
+  discounted_price: string
   image: string
 }
 
 export function ProductCard({
   id,
   name,
-  material,
-  price,
+  description,
+  brand,
+  original_price,
+  discounted_price,
   image
 }: ProductCardProps) {
   return (
@@ -46,9 +50,9 @@ export function ProductCard({
         <Link href={`/product/${id}`}>
           <h3 className="text-sm font-medium">{name}</h3>
         </Link>
-        <p className="text-sm text-gray-600">{material}</p>
-        <p className="text-sm font-medium">₹{price.toLocaleString()}</p>
+        <p className="text-sm text-gray-600">{brand}</p>
+        <p className="text-sm text-gray-600">{description}</p>
+        <p className="text-sm font-medium">₹{parseFloat(discounted_price).toLocaleString()} <span className="line-through text-gray-500">₹{parseFloat(original_price).toLocaleString()}</span></p>
       </div>
     </div>
-  )
 }

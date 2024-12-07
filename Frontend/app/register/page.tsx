@@ -16,11 +16,10 @@ export default function RegisterPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    email: "",
+    phone_number: "", // Added phone_number field
     password: "",
     password2: "",
-    first_name: "",
-    last_name: "",
+    email: "", // Removed first_name and last_name fields
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +27,12 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      await register(formData)
+      await register({
+        phone_number: formData.phone_number,
+        email: formData.email,
+        password: formData.password,
+        password2: formData.password2,
+      }) // Ensure formData includes phone_number
       toast({
         title: "Registration successful!",
         description: "Your account has been created.",
@@ -69,19 +73,9 @@ export default function RegisterPage() {
                 <div className="space-y-4">
                   <div>
                     <Input
-                      name="first_name"
-                      placeholder="First Name"
-                      value={formData.first_name}
-                      onChange={handleChange}
-                      className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      name="last_name"
-                      placeholder="Last Name"
-                      value={formData.last_name}
+                      name="phone_number" // Added phone_number input
+                      placeholder="Phone Number"
+                      value={formData.phone_number}
                       onChange={handleChange}
                       className="bg-transparent border-b border-t-0 border-x-0 rounded-none focus:border-red-600 px-0 placeholder:text-gray-500"
                       required
