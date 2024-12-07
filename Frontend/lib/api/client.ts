@@ -59,7 +59,7 @@ export class ApiClient {
           response.data, 
           response.status as 200 // Type assertion to 200
         );
-        return { ...response, data: formattedData };
+        return { ...response, data: formattedData, timestamp: new Date().toISOString() }; // Added timestamp
       },
       async (error) => {
         if (error.response?.status === 401 && this.token?.refresh) {
@@ -143,7 +143,7 @@ export class ApiClient {
         url: endpoint,
         ...config,
       });
-      return response;
+      return { ...response, timestamp: new Date().toISOString() }; // Added timestamp
     } catch (error) {
       return Promise.reject(ErrorHandler.handleError(error));
     }

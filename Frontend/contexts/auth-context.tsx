@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const token = localStorage.getItem("auth_token")
         if (token) {
-          const response = await authService.login({ token })
+          const response = await authService.login({ phone_number: token, password: '' }) // Adjusted to match LoginCredentials
           setUser(response.data.user)
         }
       } catch (error) {
