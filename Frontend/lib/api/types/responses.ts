@@ -1,3 +1,4 @@
+
 /**
  * Base API response interface
  */
@@ -32,11 +33,9 @@ export interface PaginationMeta {
   has_next_page: boolean; // Changed to snake_case to match the convention
   has_previous_page: boolean; // Changed to snake_case to match the convention
 }
-
 /**
- * Paginated response wrapper interface
+ * Paginated API response interface
  */
-export interface PaginatedResponse<T> extends ApiResponse<T> {
-  items: T[];
-  meta: PaginationMeta;
+export interface PaginatedApiResponse<T> extends ApiResponse<T> {
+  meta: PaginationMeta; // Include pagination metadata
 }

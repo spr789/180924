@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "version:1.1(remove just ear) products config yet.., re lo succ"
+git commit -m "version:2 auth products success"
 git push origin main
 
 

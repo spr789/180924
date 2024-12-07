@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductService } from '../services/products';
 import { Product, ProductFilters } from '../types/product';
 import { useToast } from '@/hooks/use-toast';
+import { PaginatedApiResponse, ApiResponse } from '../types/responses';
 
 const productService = new ProductService();
 
@@ -13,13 +14,20 @@ export function useProducts(filters?: ProductFilters) {
     data: products,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<ApiResponse<PaginatedApiResponse<Product[]>>, Error>({
     queryKey: ['products', filters],
     queryFn: () => productService.getProducts(filters),
   });
 
-  const createProduct = useMutation({
-    mutationFn: (data: Partial<Product>) => productService.createProduct(data),
+  // Log the paginated products data
+  console.log('Paginated products data:', products);
+
+  const createProduct = useMutation<
+    ApiResponse<Product>, 
+    Error,
+    Partial<Product>
+  >({
+    mutationFn: (data) => productService.createProduct(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
@@ -27,7 +35,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been created successfully.',
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: 'Error',
         description: error.message,
@@ -36,9 +44,12 @@ export function useProducts(filters?: ProductFilters) {
     },
   });
 
-  const updateProduct = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
-      productService.updateProduct(id, data),
+  const updateProduct = useMutation<
+    ApiResponse<Product>,
+    Error,
+    { id: string; data: Partial<Product> }
+  >({
+    mutationFn: ({ id, data }) => productService.updateProduct(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
@@ -46,7 +57,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been updated successfully.',
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: 'Error',
         description: error.message,
@@ -55,8 +66,12 @@ export function useProducts(filters?: ProductFilters) {
     },
   });
 
-  const deleteProduct = useMutation({
-    mutationFn: (id: string) => productService.deleteProduct(id),
+  const deleteProduct = useMutation<
+    ApiResponse<void>,
+    Error,
+    string
+  >({
+    mutationFn: (id) => productService.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
@@ -64,7 +79,7 @@ export function useProducts(filters?: ProductFilters) {
         description: 'Product has been deleted successfully.',
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: 'Error',
         description: error.message,
@@ -73,12 +88,5 @@ export function useProducts(filters?: ProductFilters) {
     },
   });
 
-  return {
-    products,
-    isLoading,
-    error,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-  };
+  return { products, isLoading, error, createProduct, updateProduct, deleteProduct };
 }

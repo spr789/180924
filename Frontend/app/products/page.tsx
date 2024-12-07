@@ -15,6 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+
 import { useProducts } from "@/lib/api/hooks/useProducts"
 import { Product } from "@/lib/api/types/product"
 
@@ -24,15 +25,14 @@ export default function ProductsPage() {
   const [showSort, setShowSort] = useState(false)
   const { products, isLoading } = useProducts()
 
-  console.log('Fetched product:', products?.data?.items?.[0] || 'No product data available');
+  console.log('Fetched product:', products?.data?.data || 'No product data available');
   console.log('Loading state:', isLoading); // Log the loading state
-  console.log('Products data structure:', products);
 
   if (isLoading) {
     return <div>Loading...</div>
   }
 
-  if (!products?.data?.items?.length) {
+  if (!products?.data?.data?.length) {
     return <div>No products found.</div>;
   }
 
@@ -43,7 +43,7 @@ export default function ProductsPage() {
         <div className="container py-4">
           <h1 className="text-2xl font-bold mb-4">All Products</h1>
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
-            {products.data.items.map((product: Product) => {
+            {products.data.data.map((product: Product) => {
               console.log('Rendering product:', product);
               return (
                 <ProductCard
