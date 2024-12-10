@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
-    'sass_processor',
+    #'sass_processor',
     'crispy_forms',
     'crispy_bootstrap5',
     'accounts',
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 CORS_ALLOW_HEADERS = [
     "accept",

@@ -25,9 +25,6 @@ export default function ProductsPage() {
   const [showSort, setShowSort] = useState(false)
   const { products, isLoading } = useProducts()
 
-  console.log('Fetched product:', products?.data?.data || 'No product data available');
-  console.log('Loading state:', isLoading); // Log the loading state
-
   if (isLoading) {
     return <div>Loading...</div>
   }
@@ -44,7 +41,6 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold mb-4">All Products</h1>
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {products.data.data.map((product: Product) => {
-              console.log('Rendering product:', product);
               return (
                 <ProductCard
                   key={product.id}
@@ -54,7 +50,8 @@ export default function ProductsPage() {
                   brand={product.brand}
                   original_price={product.original_price}
                   discounted_price={product.discounted_price}
-                  image={product.images[0] || ''}
+                  image={product.images?.[0]?.image || ''}
+                  
                 />
               );
             })}
@@ -82,7 +79,6 @@ export default function ProductsPage() {
                   onValueChange={(value) => {
                     setSortBy(value)
                     setShowSort(false)
-                    console.log('Sort by:', value);
                   }}
                 />
               </SheetContent>
@@ -103,7 +99,6 @@ export default function ProductsPage() {
                 </SheetHeader>
                 <ProductFilters onClose={() => {
                   setShowFilters(false);
-                  console.log('Filters closed');
                 }} />
               </SheetContent>
             </Sheet>

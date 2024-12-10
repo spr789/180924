@@ -1,7 +1,7 @@
 import { ApiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
 import { Product, ProductFilters } from '../types/product';
-import { ApiResponse, PaginatedResponse } from '../types/responses';
+import { ApiResponse, PaginatedApiResponse } from '../types/responses'; // Corrected import for PaginatedApiResponse
 
 export class ProductService {
   private client: ApiClient;
@@ -10,8 +10,8 @@ export class ProductService {
     this.client = ApiClient.getInstance();
   }
 
-  async getProducts(filters?: ProductFilters): Promise<ApiResponse<PaginatedResponse<Product>>> {
-    return this.client.get<PaginatedResponse<Product>>(API_ENDPOINTS.PRODUCTS.LIST, filters);
+  async getProducts(filters?: ProductFilters): Promise<ApiResponse<PaginatedApiResponse<Product>>> {
+    return this.client.get<PaginatedApiResponse<Product>>(API_ENDPOINTS.PRODUCTS.LIST, filters);
   }
 
   async getProduct(id: string): Promise<ApiResponse<Product>> {
