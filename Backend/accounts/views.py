@@ -11,9 +11,6 @@ from django.contrib.auth import authenticate, login, logout  # Add this import
 from rest_framework.permissions import AllowAny  # Add this import
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
-
-
 # ViewSets for API endpoints
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -55,18 +52,23 @@ class RegisterViewSet(viewsets.ViewSet):
         serializer = CustomUserCreationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            UserActivity.objects.create(user=user, activity='User Registration', 
+            UserActivity.objects.create(
+                user=user, 
+                activity='User Registration', 
                 ip_address=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT'))
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
             refresh = RefreshToken.for_user(user)  # Generate token for the new user
+            profile = UserProfile.objects.get(user=user)  # Get the UserProfile instance
             return Response({
                 'message': 'Registration successful.',
+                'user': CustomUserSerializer(user).data,  # Include user details
+                'profile': UserProfileSerializer(profile).data,  # Include profile details
                 'token': {'access': str(refresh.access_token), 'refresh': str(refresh)}
             }, status=201)
         return Response(serializer.errors, status=400)
 
 # API endpoint for user login
-
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
@@ -74,22 +76,32 @@ class LoginViewSet(viewsets.ViewSet):
         user = authenticate(request, phone_number=request.data.get('phone_number'), password=request.data.get('password'))
         if user:
             refresh = RefreshToken.for_user(user)
-            UserActivity.objects.create(user=user, activity='Login', successful=True,
-                ip_address=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT'))
+            UserActivity.objects.create(
+                user=user, 
+                activity='Login', 
+                successful=True,
+                ip_address=request.META.get('REMOTE_ADDR'), 
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
             login(request, user)
+            profile = UserProfile.objects.get(user=user)  # Get the UserProfile instance
             return Response({
+                'user': CustomUserSerializer(user).data,  # Include user details
+                'profile': UserProfileSerializer(profile).data,  # Include profile details
                 'token': {'access': str(refresh.access_token), 'refresh': str(refresh)}
             }, status=200)
-        return Response({'error': 'Invalid credentials BE', 'input': request.data }, status=400)
+        return Response({'error': 'Invalid credentials', 'input': request.data}, status=400)
 
 # API endpoint for user logout
 class LogoutViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request):
-        UserActivity.objects.create(user=request.user, activity='Logout',
+        UserActivity.objects.create(
+            user=request.user, 
+            activity='Logout',
             ip_address=request.META.get('REMOTE_ADDR'),
-            user_agent=request.META.get('HTTP_USER_AGENT'))
+            user_agent=request.META.get('HTTP_USER_AGENT')
+        )
         logout(request)
         return Response({'message': 'Logout successful.'}, status=200)
-

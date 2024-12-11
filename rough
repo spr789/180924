@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "version:2 auth products img success"
+git commit -m "version:2.1 auth (changed to session) products img success"
 git push origin main
 
 

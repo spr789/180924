@@ -4,8 +4,18 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { AccountSidebar } from "@/components/account/account-sidebar"
 import { AccountMain } from "@/components/account/account-main"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
+
 
 export default function AccountPage() {
+  const { user } = useAuth()
+  const router = useRouter()
+  if (user === null) {
+    router.push("/login")
+    return null
+  }
+
   return (
     <>
       <Navbar />

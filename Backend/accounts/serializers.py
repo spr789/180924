@@ -1,11 +1,19 @@
 from rest_framework import serializers
 from .models import CustomUser, UserProfile, Address, GuestUser
 
+# Serializer for UserProfile model
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture', 'date_of_birth', 'gender', 'bio', 'website_url', 'timezone']
+
 # Serializer for CustomUser registration and profile details
 class CustomUserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)  # Nested UserProfile
+
     class Meta:
         model = CustomUser
-        fields = ['phone_number', 'email', 'is_vendor', 'is_customer', 'is_staff', 'is_superuser']
+        fields = ['phone_number', 'email', 'is_vendor', 'is_customer', 'is_staff', 'is_superuser', 'profile']
         extra_kwargs = {
             'phone_number': {'required': True},
         }
@@ -38,7 +46,7 @@ class CustomUserCreationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         
-        # Check if UserProfile already exists before creating a new one
+        # Create a UserProfile for the new user
         UserProfile.objects.get_or_create(user=user)
         
         return user
@@ -51,12 +59,6 @@ class CustomUserUpdateSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'phone_number': {'validators': [CustomUser.phone_regex]},
         }
-
-# Serializer for UserProfile model
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['profile_picture', 'date_of_birth', 'gender', 'bio', 'website_url', 'timezone']
 
 # Serializer for GuestUser model
 class GuestUserSerializer(serializers.ModelSerializer):

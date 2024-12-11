@@ -5,8 +5,13 @@ import { RecentOrders } from "@/components/dashboard/recent-orders"
 import { TopProducts } from "@/components/dashboard/top-products"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { QuickActions } from "@/components/dashboard/quick-actions"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function VendorDashboardPage() {
+  const { user } = useAuth()
+
+  console.log("Is authenticated?", user, user !== null)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

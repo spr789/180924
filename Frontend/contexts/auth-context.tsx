@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { AuthService } from "@/lib/api/services/auth"
 import { User, LoginCredentials, RegisterData } from "@/lib/api/types/auth"
 import { useToast } from "@/hooks/use-toast"
+import { User } from "lucide-react"
 
 interface AuthContextType {
   user: User | null
@@ -161,5 +162,6 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
+  console.log("Current user from contexts:", context.user);
   return context
 }

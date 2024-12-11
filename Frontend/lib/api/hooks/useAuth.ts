@@ -50,6 +50,7 @@ export function useAuth() {
     setUser(null);
   }, []);
 
+  console.log("Current user from hooks:", user);
   return {
     user,
     loading,

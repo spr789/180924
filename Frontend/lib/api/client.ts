@@ -11,7 +11,7 @@ import { ResponseHandler } from './utils/response-handler';
 export class ApiClient {
   private static instance: ApiClient;
   private axiosInstance: AxiosInstance;
-  private token: { access: string; refresh: string } | null = null;
+  private token: { access: { token: string, expires_at: string }; refresh: string } | null = null;
 
   private constructor() {
     this.axiosInstance = axios.create({
@@ -44,7 +44,7 @@ export class ApiClient {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         if (this.token?.access) {
-          config.headers.Authorization = `Bearer ${this.token.access}`;
+          config.headers.Authorization = `Bearer ${this.token.access.token}`;
         }
         config.headers['X-Request-ID'] = crypto.randomUUID();
         return config;
@@ -81,12 +81,12 @@ export class ApiClient {
    */
   private loadToken(): void {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('auth_token');
       if (token) {
         try {
           this.token = JSON.parse(token);
         } catch (error) {
-          console.error("Failed to parse auth_token from localStorage:", error);
+          console.error("Failed to parse auth_token from sessionStorage:", error);
           this.clearToken(); // Clear token if parsing fails
         }
       }
@@ -96,10 +96,11 @@ export class ApiClient {
   /**
    * Set authentication token
    */
-  setToken(token: { access: string; refresh: string }): void {
-    this.token = token;
+  setToken(token: { access: { token: string, expires_at: string }; refresh: string }): void {
+    this.token = token; // Store token in memory
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', JSON.stringify(token));
+      // Store token with expiration timestamp
+      sessionStorage.setItem('auth_token', JSON.stringify(token));
     }
   }
 
@@ -109,14 +110,14 @@ export class ApiClient {
   clearToken(): void {
     this.token = null;
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_token');
     }
   }
 
   /**
    * Refresh authentication token
    */
-  async refreshToken(): Promise<{ access: string; refresh: string }> {
+  async refreshToken(): Promise<{ access: { token: string, expires_at: string }; refresh: string }> {
     if (!this.token?.refresh) {
       throw new Error('No refresh token available');
     }
@@ -126,7 +127,7 @@ export class ApiClient {
     });
 
     const newToken = {
-      access: response.data.access,
+      access: { token: response.data.access, expires_at: response.data.expires_at },
       refresh: this.token.refresh,
     };
 

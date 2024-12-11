@@ -4,8 +4,8 @@ export interface Vendor {
   description: string;
   logo: string;
   cover_image: string;
-  rating: number;
-  reviews_count: number;
+  average_rating: number;
+  rating_count: number;
   products_count: number;
   followers_count: number;
   contact_email: string;
