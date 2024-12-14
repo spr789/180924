@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { AppError } from '../errors';
+import { AppError } from '..';
 
 export interface ApiResponse<T = any> {
   data: T;

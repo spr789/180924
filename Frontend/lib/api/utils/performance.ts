@@ -37,10 +37,12 @@ export class Performance {
       try {
         const observer = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
+            const value = (entry as any).value || entry.duration || 0;
+            
             const metric = {
               name: entry.name,
-              value: entry.value,
-              rating: this.getRating(entry.name, entry.value),
+              value: value,
+              rating: this.getRating(entry.name, value),
             };
             this.logMetric(metric);
           });

@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { ApiClient } from '../client';
-import { storage } from './storage';
+import { setItem, getItem, removeItem, clearStorage } from '../utils/storage';
 import { Performance } from './performance';
 
 /**
@@ -18,7 +18,7 @@ export function setupRequestInterceptor(client: ApiClient) {
       };
 
       // Add auth token if available
-      const token = storage.get('auth_token');
+      const token = getItem('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

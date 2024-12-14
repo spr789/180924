@@ -1,4 +1,4 @@
-import { ApiResponse, PaginatedResponse, PaginationMeta } from '../types/responses';
+import { ApiResponse, PaginatedApiResponse, PaginationMeta } from '../types/responses';
 import { HTTP_STATUS } from '../config';
 
 /**
@@ -23,10 +23,9 @@ export class ResponseHandler {
     data: T[],
     meta: PaginationMeta,
     status = HTTP_STATUS.OK
-  ): PaginatedResponse<T> {
+  ): PaginatedApiResponse<T> {
     return {
       data: data as T,
-      items: data,
       meta,
       status,
       timestamp: new Date().toISOString(),

@@ -3,27 +3,26 @@ import { API_CONFIG } from './config/config'; // Adjusted import path
 import { ApiResponse } from './types/responses';
 import { ErrorHandler } from './utils/error-handler';
 import { ResponseHandler } from './utils/response-handler';
+import { getItem, setItem, removeItem } from './utils/storage'; // Import storage utilities
 
 /**
  * Core API client implementation
  * Handles all HTTP requests with proper error handling and response formatting
  */
-export class ApiClient {
+class ApiClient {
   private static instance: ApiClient;
   private axiosInstance: AxiosInstance;
-  private token: { access: { token: string, expires_at: string }; refresh: string } | null = null;
 
   private constructor() {
     this.axiosInstance = axios.create({
       baseURL: API_CONFIG.baseURL,
       timeout: API_CONFIG.timeout,
       headers: {
-        ...API_CONFIG.headers, // Using headers from API_CONFIG, no need to manually add 'Content-Type'
+        ...API_CONFIG.headers, // Using headers from API_CONFIG
       },
     });
 
     this.setupInterceptors();
-    this.loadToken();
   }
 
   /**
@@ -42,9 +41,10 @@ export class ApiClient {
   private setupInterceptors(): void {
     // Request interceptor
     this.axiosInstance.interceptors.request.use(
-      (config) => {
-        if (this.token?.access) {
-          config.headers.Authorization = `Bearer ${this.token.access.token}`;
+      async (config) => {
+        const token = this.getTokenFromStorage();
+        if (token?.access) {
+          config.headers.Authorization = `Bearer ${token.access}`;
         }
         config.headers['X-Request-ID'] = crypto.randomUUID();
         return config;
@@ -56,18 +56,20 @@ export class ApiClient {
     this.axiosInstance.interceptors.response.use(
       (response) => {
         const formattedData = ResponseHandler.formatSuccess(
-          response.data, 
+          response.data,
           response.status as 200 // Type assertion to 200
         );
         return { ...response, data: formattedData, timestamp: new Date().toISOString() }; // Added timestamp
       },
       async (error) => {
-        if (error.response?.status === 401 && this.token?.refresh) {
+        if (error.response?.status === 401) {
           try {
-            await this.refreshToken();
-            return this.axiosInstance(error.config);
+            const newToken = await this.refreshToken();
+            const config = error.config;
+            config.headers.Authorization = `Bearer ${newToken.access}`;
+            return this.axiosInstance(config);
           } catch (refreshError) {
-            this.clearToken();
+            this.clearTokenFromStorage();
             return Promise.reject(ErrorHandler.handleError(refreshError));
           }
         }
@@ -77,68 +79,72 @@ export class ApiClient {
   }
 
   /**
-   * Load token from storage
+   * Fetch token from localStorage or session
    */
-  private loadToken(): void {
-    if (typeof window !== 'undefined') {
-      const token = sessionStorage.getItem('auth_token');
-      if (token) {
-        try {
-          this.token = JSON.parse(token);
-        } catch (error) {
-          console.error("Failed to parse auth_token from sessionStorage:", error);
-          this.clearToken(); // Clear token if parsing fails
-        }
-      }
+  private getTokenFromStorage(): { access: string; refresh: string } | null {
+    return getItem<{ access: string; refresh: string }>('ct'); // Use storage utility
+  }
+
+  /**
+   * Store token in localStorage
+   */
+  private setTokenInStorage(token: { access: string; refresh: string }): void {
+    console.log("Setting token in storage:", token); // Log the token being set
+    setItem('ct', token); // Use storage utility
+    const decoded = this.decodeJwt(token.access);
+    if (decoded?.exp) {
+      const expiryTime = decoded.exp * 1000;
+      localStorage.setItem('ct_expiry', expiryTime.toString());
     }
   }
 
   /**
-   * Set authentication token
+   * Clear token from localStorage
    */
-  setToken(token: { access: { token: string, expires_at: string }; refresh: string }): void {
-    this.token = token; // Store token in memory
-    if (typeof window !== 'undefined') {
-      // Store token with expiration timestamp
-      sessionStorage.setItem('auth_token', JSON.stringify(token));
-    }
+  private clearTokenFromStorage(): void {
+    removeItem('ct'); // Use storage utility
+    localStorage.removeItem('ct_expiry');
   }
 
   /**
-   * Clear authentication token
+   * Decode JWT token to extract payload
    */
-  clearToken(): void {
-    this.token = null;
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('auth_token');
+  private decodeJwt(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(base64));
+    } catch (error) {
+      console.error('Error decoding JWT:', error);
+      return null;
     }
   }
 
   /**
    * Refresh authentication token
    */
-  async refreshToken(): Promise<{ access: { token: string, expires_at: string }; refresh: string }> {
-    if (!this.token?.refresh) {
+  async refreshToken(): Promise<{ access: string; refresh: string }> {
+    const token = this.getTokenFromStorage();
+    if (!token?.refresh) {
       throw new Error('No refresh token available');
     }
 
     const response = await this.axiosInstance.post('/auth/refresh/', {
-      refresh: this.token.refresh,
+      refresh: token.refresh,
     });
 
     const newToken = {
-      access: { token: response.data.access, expires_at: response.data.expires_at },
-      refresh: this.token.refresh,
+      access: response.data.access,
+      refresh: token.refresh,
     };
-
-    this.setToken(newToken);
+    this.setTokenInStorage(newToken);
     return newToken;
   }
 
   /**
    * Make HTTP request
    */
-  private async request<T>(
+  async request<T>(
     method: string,
     endpoint: string,
     config: Record<string, any> = {}
@@ -149,7 +155,7 @@ export class ApiClient {
         url: endpoint,
         ...config,
       });
-      return { ...response, timestamp: new Date().toISOString() }; // Added timestamp
+      return { ...response, timestamp: new Date().toISOString() };
     } catch (error) {
       return Promise.reject(ErrorHandler.handleError(error));
     }
@@ -175,4 +181,20 @@ export class ApiClient {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>('DELETE', endpoint);
   }
+
+  getToken(): { access: string; refresh: string } | null {
+    return getItem<{ access: string; refresh: string }>('ct');
+  }
+
+  clearToken(): void {
+    removeItem('ct');
+  }
 }
+
+// Move token utilities before the export statement
+
+
+// Export both the class and token utilities
+export {
+  ApiClient
+};

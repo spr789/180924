@@ -29,7 +29,7 @@ export default function LoginPage() {
         title: "Welcome back!",
         description: "You have successfully logged in.",
       })
-      router.push("/account")
+      router.push("/")
     } catch (error) {
       toast({
         title: "Login failed",

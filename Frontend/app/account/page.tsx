@@ -1,19 +1,31 @@
-"use client"
+"use client";
 
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { AccountSidebar } from "@/components/account/account-sidebar"
-import { AccountMain } from "@/components/account/account-main"
-import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
-
+import { useEffect, useState } from "react";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { AccountSidebar } from "@/components/account/account-sidebar";
+import { AccountMain } from "@/components/account/account-main";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function AccountPage() {
-  const { user } = useAuth()
-  const router = useRouter()
-  if (user === null) {
-    router.push("/login")
-    return null
+  const { user } = useAuth();
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // This ensures the code runs only on the client
+    setIsClient(true);
+
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
+  if (!isClient) {
+    // Return null or a loading indicator while waiting for the client-side check
+    return null;
   }
 
   return (
@@ -31,5 +43,5 @@ export default function AccountPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }
