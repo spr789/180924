@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     DETAIL: (id: string) => `/vendors/${id}/`,
     PRODUCTS: (id: string) => `/vendors/${id}/products/`,
     REVIEWS: (id: string) => `/vendors/${id}/reviews/`,
+    LOGIN: '/vendors/login/login/', // Added vendor login endpoint
   },
   WISHLIST: {
     LIST: '/wishlist/',

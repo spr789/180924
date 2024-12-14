@@ -6,16 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
-import { useAuth } from "@/contexts/auth-context"
+import { useVendorContext } from "@/contexts/vendor-context"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { VendorProvider } from "@/contexts/vendor-context"
 
-export default function LoginPage() {
+function VendorLoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { loginVendor } = useVendorContext()
   const { toast } = useToast()
-  const [phoneNumber, setPhoneNumber] = useState("") // Changed from email to phoneNumber
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
@@ -24,7 +25,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login({ phone_number: phoneNumber, password }) // Adjusted to match LoginCredentials
+      await loginVendor.mutateAsync({ phone_number: phoneNumber, password })
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
@@ -33,7 +34,7 @@ export default function LoginPage() {
     } catch (error) {
       toast({
         title: "Login failed",
-        description: "Invalid phone number or password. Please try again.", // Updated message
+        description: "Invalid phone number or password. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -46,7 +47,6 @@ export default function LoginPage() {
       <Navbar />
       <main className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
         <div className="w-full max-w-[1000px] grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Gradient Side */}
           <div className="relative hidden md:block">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400">
               <div className="absolute inset-0 bg-[url('/auth-pattern.svg')] opacity-20" />
@@ -62,7 +62,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Form Side */}
           <div className="p-8 md:p-12">
             <div className="max-w-sm mx-auto">
               <div className="text-center mb-8">
@@ -74,7 +73,7 @@ export default function LoginPage() {
                 <div className="space-y-4">
                   <div>
                     <Input
-                      type="text" // Changed from email to text for phone number
+                      type="text"
                       placeholder="Phone Number"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
@@ -134,4 +133,12 @@ export default function LoginPage() {
       <Footer />
     </>
   )
+}
+
+export default function VendorLoginPageWithProvider() {
+  return (
+    <VendorProvider>
+      <VendorLoginPage />
+    </VendorProvider>
+  );
 }

@@ -9,7 +9,26 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "version:2.2 auth products vendors success"
+git commit -m "version:2.2 vendor auth at progress"
 git push origin main
 
 curl -X POST http://127.0.0.1:8000/api/vendors/login/login/ -H "Content-Type: application/json" -d '{"phone_number": "7893343436", "password": "123"}'
+curl -X POST http://localhost:8000/api/products/ \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MTk4ODE3LCJpYXQiOjE3MzQxOTcwMTcsImp0aSI6IjViZjA2NjlhOTVlMDRlM2VhOTBiZTFlYmEyNTE0MDQ2IiwidXNlcl9pZCI6MX0.1Sq9cveuGZs-LiEMMfbBD7bvQ7oHmB5DtRcXWr-2WdM" \
+     -d '{
+           "name": "New Product",
+           "description": "This is a new product.",
+           "brand": "BrandName",
+           "sku": "12345",
+           "original_price": 99.99,
+           "stock": 100,
+           "vendor": 1,  
+           "category": 1,  
+           "collection": 1
+         }'
+
+hi
+
+
+
