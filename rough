@@ -9,7 +9,7 @@ npm run dev
 http://localhost:3000
 
 git add .
-git commit -m "version:2.2 vendor auth at progress"
+git commit -m "version:2.4 vendor auth completed"
 git push origin main
 
 curl -X POST http://127.0.0.1:8000/api/vendors/login/login/ -H "Content-Type: application/json" -d '{"phone_number": "7893343436", "password": "123"}'

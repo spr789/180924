@@ -9,28 +9,20 @@ export function useVendors() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const {
-    data: vendors,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['vendors'],
-    queryFn: () => vendorService.getVendors(),
-    onSuccess: (data) => {
-      console.log('Fetched vendors:', data);
-    },
-    onError: (error) => {
-      console.error('Error fetching vendors:', error);
-    },
-  });
+  const vendors = null;
+  const isLoading = false;
+  const error = null;
 
   const loginVendor = useMutation({
     mutationFn: (credentials: VendorLoginRequest) => vendorService.loginVendor(credentials),
     onSuccess: (data) => {
-      console.log('Vendor login successful:', data);
-      toast({
+      const user = data.data.data.user;
+      const token = data.data.data.token; // Assuming the token is part of the response
+      localStorage.setItem('token1', token); // Save token in local storage
+      console.log('Token saved to localStorage:', token); // Log the token
+           toast({
         title: 'Login Successful',
-        description: `Welcome back, ${data.data.user.id}!`,
+        description: `Welcome back, ${user.phone_number}!`,
       });
       queryClient.invalidateQueries({ queryKey: ['vendors'] });
     },

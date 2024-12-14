@@ -7,7 +7,7 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { QuickActions } from "@/components/dashboard/quick-actions"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getToken } from "@/lib/api/services/auth"
+import { getToken } from "@/lib/api/services/vendors"
 
 export default function VendorDashboardPage() {
   const router = useRouter()
@@ -15,7 +15,7 @@ export default function VendorDashboardPage() {
   useEffect(() => {
     const token = getToken()
     if (!token) {
-      router.push("/login")
+      router.push("/vendor")
     }
   }, [router])
 

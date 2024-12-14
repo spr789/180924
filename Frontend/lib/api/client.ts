@@ -3,7 +3,9 @@ import { API_CONFIG } from './config/config'; // Adjusted import path
 import { ApiResponse } from './types/responses';
 import { ErrorHandler } from './utils/error-handler';
 import { ResponseHandler } from './utils/response-handler';
-import { getToken, setToken, removeToken } from './services/auth'; // Import token utilities
+import { getToken } from './services/auth'; // Import token utilities
+
+
 
 /**
  * Core API client implementation
@@ -71,7 +73,6 @@ class ApiClient {
             config.headers.Authorization = `Bearer ${newToken.access}`;
             return this.axiosInstance(config);
           } catch (refreshError) {
-            removeToken();
             return Promise.reject(ErrorHandler.handleError(refreshError));
           }
         }
@@ -99,7 +100,6 @@ class ApiClient {
       refresh: token.refresh,
     };
     console.log('Newly obtained token:', newToken); // Log the newly obtained token
-    setToken(newToken);
     return newToken;
   }
 
