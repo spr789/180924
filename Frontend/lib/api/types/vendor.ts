@@ -1,32 +1,24 @@
 export interface Vendor {
-  id: string;
-  name: string;
-  description: string;
-  logo: string;
-  cover_image: string;
-  average_rating: number;
-  rating_count: number;
-  products_count: number;
-  followers_count: number;
-  contact_email: string;
-  contact_phone: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
+  user: {
+    username: string | null;
+    email: string;
+    phone_number: string;
+    id: number;
   };
-  social_media?: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
+  profile: {
+    business_name: string;
+    business_address: string;
+    website_url: string;
+    verification_status: string;
   };
-  badges: string[];
-  metrics: {
-    response_rate: number;
-    ship_on_time: number;
-    order_completion: number;
+  analytics: {
+    total_sales?: number;
+    total_orders?: number;
+    total_revenue?: number;
+    last_updated?: string;
   };
-  created_at: string;
-  updated_at: string;
+  token: {
+    access: string;
+    refresh: string;
+  };
 }

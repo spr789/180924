@@ -5,12 +5,21 @@ import { RecentOrders } from "@/components/dashboard/recent-orders"
 import { TopProducts } from "@/components/dashboard/top-products"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { QuickActions } from "@/components/dashboard/quick-actions"
-import { useAuth } from "@/contexts/auth-context"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { getToken } from "@/lib/api/services/auth"
 
 export default function VendorDashboardPage() {
-  const { user } = useAuth()
+  const router = useRouter()
 
-  console.log("Is authenticated?", user, user !== null)
+  useEffect(() => {
+    const token = getToken()
+    if (!token) {
+      router.push("/login")
+    }
+  }, [router])
+
+  console.log("Is authenticated?", getToken() !== null)
 
   return (
     <div className="space-y-6">

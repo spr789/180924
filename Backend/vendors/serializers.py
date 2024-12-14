@@ -9,7 +9,7 @@ class VendorRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'phone_number', 'email', 'password', 'password2']
+        fields = ['phone_number', 'email', 'password', 'password2']
 
     def validate(self, data):
         if data['password'] != data['password2']:
@@ -65,4 +65,4 @@ class VendorNotificationSerializer(serializers.ModelSerializer):
 class VendorAnalyticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = VendorAnalytics
-        fields = ['total_sales', 'total_orders', 'total_revenue', 'last_updated']
+        fields = ['total_sales', 'total_orders', 'total_revenue', 'last_updated', 'vendor']

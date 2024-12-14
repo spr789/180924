@@ -22,7 +22,7 @@ export function useAuth() {
     console.log('Attempting to log in with credentials hooks:', credentials); // Log the credentials being used for login
     try {
       const response = await authService.login(credentials);
-      const userData = response.data.user;
+      const userData = response.data.data.user;
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData)); // Store user data in localStorage
       console.log('Login successful, user data hooks:', userData); // Log the user data after successful login
