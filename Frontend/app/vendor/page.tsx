@@ -1,45 +1,63 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import Link from "next/link"
-import { useVendorContext } from "@/contexts/vendor-context"
-import { useToast } from "@/hooks/use-toast"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { VendorProvider } from "@/contexts/vendor-context"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
+import { VendorProvider, useVendorContext } from "@/contexts/vendor-context";
+import { useToast } from "@/hooks/use-toast";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
 function VendorLoginPage() {
-  const router = useRouter()
-  const { loginVendor } = useVendorContext()
-  const { toast } = useToast()
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const { loginVendor, vendorToken } = useVendorContext();  // Use token from context
+  const { toast } = useToast();
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Persist the phoneNumber and password when the page reloads (through localStorage or session)
+  useEffect(() => {
+    const savedPhoneNumber = localStorage.getItem("phoneNumber");
+    const savedPassword = localStorage.getItem("password");
+
+    if (savedPhoneNumber) setPhoneNumber(savedPhoneNumber);
+    if (savedPassword) setPassword(savedPassword);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      await loginVendor.mutateAsync({ phone_number: phoneNumber, password })
+      // Attempt to log in the vendor
+      await loginVendor.mutate({ phone_number: phoneNumber, password });
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
-      })
-      router.push("/vendor/dashboard")
+      });
+      // Save credentials to localStorage if remember me is checked
+     
+      localStorage.setItem("vendorToken", vendorToken);
+
+      router.push("/");
     } catch (error) {
       toast({
         title: "Login failed",
         description: "Invalid phone number or password. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
+  };
+
+  // Check if vendor is already logged in
+  if (vendorToken) {
+    router.push("/dashboard");  // Redirect to dashboard if already logged in
   }
 
   return (
@@ -132,7 +150,7 @@ function VendorLoginPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }
 
 export default function VendorLoginPageWithProvider() {

@@ -1,115 +1,168 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { VendorService } from '../services/vendors';
-import { useToast } from '@/hooks/use-toast';
-import { VendorLoginRequest } from '../types/vendor';
+import { useEffect, useState } from 'react';
+import { VendorProvider } from '../../../contexts/vendor-context';
+import { Vendor, VendorOrder, VendorPayout, VendorShipment, VendorNotification } from '../types/vendor';
+import { PaginatedApiResponse } from '../types/responses';
 
-const vendorService = new VendorService();
+export const useVendors = () => {
+  const vendorService = VendorProvider();
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export function useVendors() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  useEffect(() => {
+    const fetchVendors = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendors();
+        setVendors(response.data.results);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch vendors');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVendors();
+  }, [vendorService]);
 
-  const vendors = null;
-  const isLoading = false;
-  const error = null;
+  return { vendors, loading, error };
+};
 
-  const loginVendor = useMutation({
-    mutationFn: (credentials: VendorLoginRequest) => vendorService.loginVendor(credentials),
-    onSuccess: (data) => {
-      const user = data.data.data.user;
-      const token = data.data.data.token; // Assuming the token is part of the response
-      localStorage.setItem('token1', token); // Save token in local storage
-      console.log('Token saved to localStorage:', token); // Log the token
-           toast({
-        title: 'Login Successful',
-        description: `Welcome back, ${user.phone_number}!`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-    },
-    onError: (error: Error) => {
-      console.error('Vendor login failed:', error);
-      toast({
-        title: 'Login Failed',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
+export const useVendor = (id: string) => {
+  const vendorService = useVendorService();
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const followVendor = useMutation({
-    mutationFn: (vendorId: string) => vendorService.followVendor(vendorId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      toast({
-        title: 'Following vendor',
-        description: 'You are now following this vendor.',
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
+  useEffect(() => {
+    const fetchVendor = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendor(id);
+        setVendor(response.data);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch vendor');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVendor();
+  }, [id, vendorService]);
 
-  const unfollowVendor = useMutation({
-    mutationFn: (vendorId: string) => vendorService.unfollowVendor(vendorId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      toast({
-        title: 'Unfollowed vendor',
-        description: 'You are no longer following this vendor.',
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
+  return { vendor, loading, error };
+};
 
-  const getVendorOrders = (vendorId: string) => {
-    return useQuery({
-      queryKey: ['vendorOrders', vendorId],
-      queryFn: () => vendorService.getVendorOrders(vendorId),
-    });
+export const useVendorOrders = (id: string) => {
+  const vendorService = useVendorService();
+  const [orders, setOrders] = useState<VendorOrder[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendorOrders(id);
+        setOrders(response.data.results);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch vendor orders');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [id, vendorService]);
+
+  return { orders, loading, error };
+};
+
+export const useVendorActions = () => {
+  const vendorService = useVendorService();
+
+  const followVendor = async (id: string) => {
+    await vendorService.followVendor(id);
   };
 
-  const getVendorPayouts = (vendorId: string) => {
-    return useQuery({
-      queryKey: ['vendorPayouts', vendorId],
-      queryFn: () => vendorService.getVendorPayouts(vendorId),
-    });
+  const unfollowVendor = async (id: string) => {
+    await vendorService.unfollowVendor(id);
   };
 
-  const getVendorShipments = (vendorId: string) => {
-    return useQuery({
-      queryKey: ['vendorShipments', vendorId],
-      queryFn: () => vendorService.getVendorShipments(vendorId),
-    });
-  };
+  return { followVendor, unfollowVendor };
+};
 
-  const getVendorNotifications = (vendorId: string) => {
-    return useQuery({
-      queryKey: ['vendorNotifications', vendorId],
-      queryFn: () => vendorService.getVendorNotifications(vendorId),
-    });
-  };
+export const useVendorNotifications = (id: string) => {
+  const vendorService = useVendorService();
+  const [notifications, setNotifications] = useState<VendorNotification[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  return {
-    vendors,
-    isLoading,
-    error,
-    loginVendor,
-    followVendor,
-    unfollowVendor,
-    getVendorOrders,
-    getVendorPayouts,
-    getVendorShipments,
-    getVendorNotifications,
-  };
-}
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendorNotifications(id);
+        setNotifications(response.data.results);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch notifications');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, [id, vendorService]);
+
+  return { notifications, loading, error };
+};
+
+export const useVendorPayouts = (id: string) => {
+  const vendorService = useVendorService();
+  const [payouts, setPayouts] = useState<VendorPayout[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPayouts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendorPayouts(id);
+        setPayouts(response.data.results);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch payouts');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPayouts();
+  }, [id, vendorService]);
+
+  return { payouts, loading, error };
+};
+
+export const useVendorShipments = (id: string) => {
+  const vendorService = useVendorService();
+  const [shipments, setShipments] = useState<VendorShipment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchShipments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await vendorService.getVendorShipments(id);
+        setShipments(response.data.results);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch shipments');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchShipments();
+  }, [id, vendorService]);
+
+  return { shipments, loading, error };
+};
