@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { AuthService } from "@/lib/api/services/auth";
 import { User, LoginCredentials, RegisterData } from "@/lib/api/types/auth";
 import { useToast } from "@/hooks/use-toast";
-import { getToken, setToken, removeToken } from "@/lib/api/services/auth"; // Use these utilities for token management
 import { jwtDecode } from "jwt-decode"; // Install with `npm install jwt-decode`
 
 interface AuthContextType {
@@ -27,13 +26,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const authService = new AuthService();
 
+  // Token management functions
+  const getToken = () => {
+    return JSON.parse(localStorage.getItem("authToken") || "null");
+  };
+
+  const setToken = (token: { access: string; refresh: string }) => {
+    localStorage.setItem("authToken", JSON.stringify(token));
+  };
+
+  const removeToken = () => {
+    localStorage.removeItem("authToken");
+  };
+
   // Initialize authentication from token
   const initAuth = async () => {
     try {
-      const token = getToken(); // Fetch token using client.ts utility
+      const token = getToken();
       if (token && typeof token.access === 'string') {
-        const decodedToken = jwtDecode<{ user: any }>(token.access); // Decode to extract user
-        const user = decodedToken.user; // Adjust based on token structure
+        const decodedToken = jwtDecode<{ user: any }>(token.access);
+        const user = decodedToken.user;
         setUser(user);
       }
     } catch (error) {
@@ -52,8 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       const response = await authService.login(credentials);
-      setUser(response.data.user);
-      setToken(response.data.token); // Save token via client.ts utility
+      setUser(response.data.data.user);
+      setToken(response.data.data.token);
+      console.log('Token:', response.data.token); // Added console log for token
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
@@ -77,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await authService.register(data);
       setUser(response.data.user);
-      setToken(response.data.token); // Save token via client.ts utility
+      setToken(response.data.token);
       toast({
         title: "Welcome!",
         description: "Your account has been created successfully.",
@@ -100,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout();
       setUser(null);
-      removeToken(); // Remove token via client.ts utility
+      removeToken();
       router.push("/login");
       toast({
         title: "Logged out",

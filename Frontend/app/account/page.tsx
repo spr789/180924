@@ -17,7 +17,7 @@ export default function AccountPage() {
     // This ensures the code runs only on the client
     setIsClient(true);
 
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("authToken"); // Corrected token key
     if (!token) {
       router.push("/login");
     }
